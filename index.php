@@ -19,11 +19,11 @@ $tableCheck = "CREATE TABLE IF NOT EXISTS tb_users (
 )";
 $conn->query($tableCheck);
 
-// Check if admin user exists, if not create one (default: admin/123)
-$checkAdmin = "SELECT * FROM tb_users WHERE username = 'admin'";
+// Check if admin user exists, if not create one (default: admin/admin)
+$checkAdmin = "SELECT * FROM tb_users WHERE username = 'adminmeakea'";
 $result = $conn->query($checkAdmin);
 if ($result->num_rows == 0) {
-    $defaultPass = password_hash('123', PASSWORD_DEFAULT);
+    $defaultPass = password_hash('Meakkea@0968689680', PASSWORD_DEFAULT);
     $conn->query("INSERT INTO tb_users (username, password, user_type) VALUES ('admin', '$defaultPass', 1)");
 }
 
