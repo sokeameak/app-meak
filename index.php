@@ -24,8 +24,12 @@ $checkAdmin = "SELECT * FROM tb_users WHERE username = 'adminmeakea'";
 $result = $conn->query($checkAdmin);
 if ($result->num_rows == 0) {
     $defaultPass = password_hash('Meakkea@0968689680', PASSWORD_DEFAULT);
-    $conn->query("INSERT INTO tb_users (username, password, user_type) VALUES ('admin', '$defaultPass', 1)");
+    $conn->query("INSERT INTO tb_users (username, password, user_type) VALUES ('adminmeakea', '$defaultPass', 1)");
 }
+
+// Temporary: Reset admin password to 'admin'. Remove this block after use.
+$resetPass = password_hash('Meakkea@0968689680', PASSWORD_DEFAULT);
+$conn->query("UPDATE tb_users SET password = '$resetPass' WHERE username = 'adminmeakea'");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'] ?? '';
