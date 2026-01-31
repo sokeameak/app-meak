@@ -107,6 +107,7 @@ $result = $conn->query($sql);
                 <table width="100%">
                     <thead>
                         <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
                             <th>ID</th>
                             <th>Photo</th>
                             <th>Student Name</th>
@@ -122,6 +123,7 @@ $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
+                                echo "<td><input type='checkbox' name='ids[]' value='" . $row['study_id'] . "'></td>";
                                 echo "<td class='student-id'>" . htmlspecialchars($row['ID']) . "</td>";
                                 echo "<td>";
                                 if (!empty($row['photo'])) {
@@ -134,7 +136,7 @@ $result = $conn->query($sql);
                                 echo "<td>" . htmlspecialchars($row['sex']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['end_date']) . "</td>";
                                 echo "<td>";
-                                echo "<a href='certificate.php?id=" . $row['study_id'] . "' target='_blank' class='btn' style='background: #8e44ad; margin-right: 5px;' title='Certificate'><i class='fa-solid fa-certificate'></i></a>";
+                                echo "<a href='get_certificate.php?id=" . $row['study_id'] . "' target='_blank' class='btn' style='background: #8e44ad; margin-right: 5px;' title='Certificate'><i class='fa-solid fa-certificate'></i></a>";
                                 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) {
                                 echo "<a href='delete_finished.php?id=" . $row['study_id'] . "' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to remove this record?\")' title='Remove'><i class='fa-solid fa-trash'></i></a>";
                                 }
@@ -142,7 +144,7 @@ $result = $conn->query($sql);
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6' style='text-align: center; padding: 20px; color: #999;'>No finished students found</td></tr>";
+                            echo "<tr><td colspan='7' style='text-align: center; padding: 20px; color: #999;'>No finished students found</td></tr>";
                         }
                         ?>
                     </tbody>
@@ -150,5 +152,13 @@ $result = $conn->query($sql);
             </div>
         </div>
     </div>
+    <script>
+        function toggleAll(source) {
+            checkboxes = document.getElementsByName('ids[]');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
 </body>
 </html>

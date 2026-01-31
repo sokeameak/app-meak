@@ -125,7 +125,7 @@ $khmer_months = [
                     ?>
                 </div>
                 <div class="sig-title" style="font-family: 'Khmer OS Muol Light';">គណៈគ្រប់គ្រង</div>
-                <img src="../logo/meakea.png" alt="Signature" style="width: 120px; margin: 5px auto;">
+                <img src="../logo/meakea.png" alt="Signature" id="sigImage" style="width: 120px; margin: 5px auto;">
                 <h2 style="font-family: 'Khmer OS Muol Light'; color: #a50000; margin: 0;">មាគ គា</h2>
             </div>
         </div>
