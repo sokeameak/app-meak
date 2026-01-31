@@ -100,7 +100,10 @@ $result = $conn->query($sql);
                     <h1>Finished Students</h1>
                     <p>List of students who have completed their courses.</p>
                 </div>
-                <a href="add_finished_student.php" class="btn btn-add">+ Add Finished Student</a>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="search_name" onkeyup="filterFinishedStudents()" placeholder="Search Name..." style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="add_finished_student.php" class="btn btn-add">+ Add Finished Student</a>
+                </div>
             </div>
 
             <div class="card">
@@ -157,6 +160,25 @@ $result = $conn->query($sql);
             checkboxes = document.getElementsByName('ids[]');
             for(var i=0, n=checkboxes.length;i<n;i++) {
                 checkboxes[i].checked = source.checked;
+            }
+        }
+
+        function filterFinishedStudents() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_name");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[3]; // Column 3 is Student Name
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
             }
         }
     </script>

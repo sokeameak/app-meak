@@ -19,10 +19,16 @@ if ($rowUser = $resUser->fetch_assoc()) {
 }
 $stmt->close();
 
-$whereSQL = "";
+$search = $_GET['search'] ?? '';
+$whereConditions = [];
 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
-    $whereSQL = " WHERE school_id = " . $user_school_id;
+    $whereConditions[] = "school_id = " . $user_school_id;
 }
+if (!empty($search)) {
+    $whereConditions[] = "student_name LIKE '%" . $conn->real_escape_string($search) . "%'";
+}
+
+$whereSQL = !empty($whereConditions) ? " WHERE " . implode(" AND ", $whereConditions) : "";
 
 // Fetch all students from database
 $sql = "SELECT ID, student_name, sex, dob, other, photo, (SELECT school_name FROM tb_schools WHERE id = tb_students.school_id) as school_name, (SELECT COUNT(*) FROM tb_study WHERE id_stu = tb_students.ID) as study_count FROM tb_students $whereSQL ORDER BY ID DESC";
@@ -105,7 +111,11 @@ $result = $conn->query($sql);
                     <h1>Student List</h1>
                     <p>Manage all registered students</p>
                 </div>
-                <div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <form method="GET" style="margin: 0; display: flex; gap: 10px;">
+                        <input type="text" id="search_name" name="search" onkeyup="filterStudents()" placeholder="Search Name..." value="<?php echo htmlspecialchars($search); ?>" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <button type="submit" class="btn" style="background: #2c3e50;">Search</button>
+                    </form>
                     <a href="finished_student.php" class="btn" style="background: #f39c12;">Finished Students</a>
                     <a href="register_student.php" class="btn btn-add">+ Add Student</a>
                 </div>
@@ -162,5 +172,25 @@ $result = $conn->query($sql);
             </div>
         </div>
     </div>
+    <script>
+        function filterStudents() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_name");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2]; // Column 2 is Student Name
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
