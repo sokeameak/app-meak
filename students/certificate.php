@@ -130,16 +130,6 @@ $khmer_months = [
             </div>
         </div>
         
-        <?php
-        // Generate QR Code URL pointing to the current page
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $currentLink = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($currentLink);
-        ?>
-        <div style="position: absolute; bottom: 90px; left: 90px; text-align: center;">
-            <img src="<?php echo $qrCodeUrl; ?>" alt="Scan to Verify" style="width: 90px; height: 90px; border: 1px solid #eee; padding: 2px;">
-            <div style="font-size: 10px; margin-top: 2px; font-family: Arial; color: #333;">Scan to Verify</div>
-        </div>
 
         <div class="no-print" style="margin-top: 40px;">
             <button onclick="window.print()" style="padding: 12px 24px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 16px;">Print Certificate</button>
