@@ -19,19 +19,19 @@ if ($rowUser = $resUser->fetch_assoc()) {
 }
 $stmt->close();
 
-$search = $_GET['search'] ?? '';
-$whereConditions = [];
+$whereSQL = " WHERE s.end_date <= CURDATE()";
 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
-    $whereConditions[] = "school_id = " . $user_school_id;
-}
-if (!empty($search)) {
-    $whereConditions[] = "student_name LIKE '%" . $conn->real_escape_string($search) . "%'";
+    $whereSQL .= " AND st.school_id = " . $user_school_id;
 }
 
-$whereSQL = !empty($whereConditions) ? " WHERE " . implode(" AND ", $whereConditions) : "";
-
-// Fetch all students from database
-$sql = "SELECT ID, student_name, sex, dob, other, photo, (SELECT school_name FROM tb_schools WHERE id = tb_students.school_id) as school_name, (SELECT COUNT(*) FROM tb_study WHERE id_stu = tb_students.ID) as study_count FROM tb_students $whereSQL ORDER BY ID DESC";
+// Fetch finished students (where end_date is in the past)
+$sql = "SELECT s.id as study_id, st.ID, st.student_name, st.sex, st.dob, st.photo, s.end_date, c.Course, sch.school_name 
+        FROM tb_study s 
+        JOIN tb_students st ON s.id_stu = st.ID 
+        JOIN tb_course c ON s.id_code = c.ID 
+        LEFT JOIN tb_schools sch ON st.school_id = sch.id
+        $whereSQL
+        ORDER BY s.end_date DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -40,7 +40,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student List</title>
+    <title>Finished Students</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,7 +53,6 @@ $result = $conn->query($sql);
         .sidebar a i { margin-right: 10px; width: 20px; text-align: center; }
         .main-content { flex: 1; padding: 20px; }
         .header { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { flex: 1; }
         .card { background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
@@ -62,16 +61,10 @@ $result = $conn->query($sql);
         .student-id { font-weight: bold; background: #ecf0f1; width: 60px; }
         .btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; text-decoration: none; display: inline-block; }
         .btn:hover { background: #2980b9; }
-        .btn-edit { background: #27ae60; }
-        .btn-edit:hover { background: #229954; }
-        .btn-delete { background: #e74c3c; }
-        .btn-delete:hover { background: #c0392b; }
         .btn-add { background: #16a085; padding: 10px 20px; }
         .btn-add:hover { background: #138d75; }
-        .btn-study { background: #8e44ad; }
-        .btn-study:hover { background: #732d91; }
-        .btn-has-study { background: #e67e22; }
-        .btn-has-study:hover { background: #d35400; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
     </style>
 </head>
 <body>
@@ -82,58 +75,51 @@ $result = $conn->query($sql);
                     <?php echo strtoupper(substr($_SESSION['user'], 0, 1)); ?>
                 </div>
                 <div style="color: white; font-weight: bold; font-size: 1.1em;"><?php echo htmlspecialchars($_SESSION['user']); ?></div>
-                <div style="color: #bdc3c7; font-size: 0.8em; margin-top: 5px;"><?php echo (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) ? $lang['admin'] : $lang['normal_user']; ?></div>
-                <div style="margin-top: 10px;">
-                    <a href="<?php echo getUrlWithLang('en'); ?>" style="display:inline; padding:5px; color:white; <?php echo $selected_lang=='en'?'font-weight:bold; text-decoration:underline;':''; ?>">EN</a> | 
-                    <a href="<?php echo getUrlWithLang('kh'); ?>" style="display:inline; padding:5px; color:white; <?php echo $selected_lang=='kh'?'font-weight:bold; text-decoration:underline;':''; ?>">KH</a>
-                </div>
+                <div style="color: #bdc3c7; font-size: 0.8em; margin-top: 5px;"><?php echo (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) ? 'Administrator' : 'Normal User'; ?></div>
             </div>
-            <h3><?php echo $lang['dashboard']; ?></h3>
-            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> <?php echo $lang['home']; ?></a>
-            <a href="list_student.php" style="background: #34495e;"><i class="fa-solid fa-user-graduate"></i> <?php echo $lang['students']; ?></a>
-            <a href="register_student.php"><i class="fa-solid fa-user-plus"></i> <?php echo $lang['add_student']; ?></a>
-            <!-- <a href="register_student_study.php"><i class="fa-solid fa-registered"></i> <?php echo $lang['register_study']; ?></a> -->
-            <a href="../study/list_study.php"><i class="fa-solid fa-book-open"></i> <?php echo $lang['study']; ?></a>
-            <a href="../courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> <?php echo $lang['course']; ?></a>
-            <a href="../time/grades.php"><i class="fa-solid fa-clock"></i> <?php echo $lang['grades']; ?></a>
-            <a href="../invoice/invoice.php"><i class="fa-solid fa-file-invoice-dollar"></i> <?php echo $lang['invoices']; ?></a>
-            <a href="finished_student.php"><i class="fa-solid fa-user-check"></i> <?php echo $lang['finished_students']; ?></a>
-            <a href="../invoice/paid.php"><i class="fa-solid fa-file-invoice"></i> <?php echo $lang['paid_list']; ?></a>
+            <h3>Dashboard</h3>
+            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> Home</a>
+            <a href="list_student.php"><i class="fa-solid fa-user-graduate"></i> Students</a>
+            <a href="register_student.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            <!-- <a href="register_student_study.php"><i class="fa-solid fa-registered"></i> Register & Study</a> -->
+            <a href="../study/list_study.php"><i class="fa-solid fa-book-open"></i> Study</a>
+            <a href="../courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> Course</a>
+            <a href="../time/grades.php"><i class="fa-solid fa-clock"></i> Grades</a>
+            <a href="../invoice/invoice.php"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</a>
+            <a href="finished_student.php" style="background: #34495e;"><i class="fa-solid fa-user-check"></i> Finished Students</a>
+            <a href="../invoice/paid.php"><i class="fa-solid fa-file-invoice"></i> Paid List</a>
             <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
-            <a href="../users/add_users.php"><i class="fa-solid fa-users-cog"></i> <?php echo $lang['users']; ?></a>
+            <a href="../users/add_users.php"><i class="fa-solid fa-users-cog"></i> Users</a>
             <?php endif; ?>
-            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> <?php echo $lang['logout']; ?></a>
+            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
         </div>
 
         <div class="main-content">
             <div class="header">
                 <div>
-                    <h1>Student List</h1>
-                    <p>Manage all registered students</p>
+                    <h1>Finished Students</h1>
+                    <p>List of students who have completed their courses.</p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <form method="GET" style="margin: 0; display: flex; gap: 10px;">
-                        <input type="text" id="search_name" name="search" onkeyup="filterStudents()" placeholder="Search Name..." value="<?php echo htmlspecialchars($search); ?>" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                        <button type="submit" class="btn" style="background: #2c3e50;">Search</button>
-                    </form>
-                    <a href="finished_student.php" class="btn" style="background: #f39c12;">Finished Students</a>
-                    <a href="register_student.php" class="btn btn-add">+ Add Student</a>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="search_name" onkeyup="filterFinishedStudents()" placeholder="Search Name..." style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="add_finished_student.php" class="btn btn-add">+ Add Finished Student</a>
                 </div>
             </div>
 
             <div class="card">
+            <form method="POST" action="insert_certi.php">
                 <table width="100%">
                     <thead>
                         <tr>
-                        <th>Get</th>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
                             <th>ID</th>
                             <th>Photo</th>
                             <th>Student Name</th>
                             <th>Sex</th>
-                            <th>Date of Birth</th>
+                            <th>Course</th>
                             <th>School</th>
-                            <th>Other Info</th>
-                            <th style="width: 180px;">Actions</th>
+                            <th>Finished Date</th>
+                            <th style="width: 150px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,6 +127,7 @@ $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
+                                echo "<td><input type='checkbox' name='ids[]' value='" . $row['study_id'] . "'></td>";
                                 echo "<td class='student-id'>" . htmlspecialchars($row['ID']) . "</td>";
                                 echo "<td>";
                                 if (!empty($row['photo'])) {
@@ -150,38 +137,44 @@ $result = $conn->query($sql);
                                 }
                                 echo "</td>";
                                 echo "<td>" . htmlspecialchars($row['student_name']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['sex'] === 'Male' ? 'ប្រុស' : ($row['sex'] === 'Female' ? 'ស្រី' : $row['sex'])) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['dob']) . "</td>";
-                                echo "<td><span style='font-size:0.9em; color:#555;'>" . htmlspecialchars($row['school_name'] ?? 'Default') . "</span></td>";
-                                echo "<td>" . htmlspecialchars(substr($row['other'] ?? '', 0, 50)) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['sex']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['end_date']) . "</td>";
                                 echo "<td>";
-                                $btnClass = ($row['study_count'] > 0) ? 'btn-has-study' : 'btn-study';
-                                echo "<a href='../study/add_study.php?id_stu=" . $row['ID'] . "' class='btn " . $btnClass . "' title='Study'><i class='fa-solid fa-book-open'></i></a>";
-                                echo "<a href='edit_student.php?id=" . $row['ID'] . "' class='btn btn-edit' title='Edit'><i class='fa-solid fa-pen-to-square'></i></a>";
+                                echo "<a href='get_certificate.php?id=" . $row['study_id'] . "' target='_blank' class='btn' style='background: #8e44ad; margin-right: 5px;' title='Certificate'><i class='fa-solid fa-certificate'></i></a>";
                                 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) {
-                                echo "<a href='delete_student.php?id=" . $row['ID'] . "' class='btn btn-delete' onclick='return confirm(\"Are you sure?\")' title='Delete'><i class='fa-solid fa-trash'></i></a>";
+                                echo "<a href='delete_finished.php?id=" . $row['study_id'] . "' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to remove this record?\")' title='Remove'><i class='fa-solid fa-trash'></i></a>";
                                 }
                                 echo "</td>";
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6' style='text-align: center; padding: 20px; color: #999;'>No students found</td></tr>";
+                            echo "<tr><td colspan='7' style='text-align: center; padding: 20px; color: #999;'>No finished students found</td></tr>";
                         }
                         ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn" style="margin-top: 10px;">
+                    Insert into tbl_certi
+                </button>
             </div>
         </div>
     </div>
     <script>
-        function filterStudents() {
+        function toggleAll(source) {
+            checkboxes = document.getElementsByName('ids[]');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        function filterFinishedStudents() {
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("search_name");
             filter = input.value.toUpperCase();
             table = document.querySelector("table");
             tr = table.getElementsByTagName("tr");
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[2]; // Column 2 is Student Name
+                td = tr[i].getElementsByTagName("td")[3]; // Column 3 is Student Name
                 if (td) {
                     txtValue = td.textContent || td.innerText;
                     if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -192,6 +185,7 @@ $result = $conn->query($sql);
                 }
             }
         }
+       
     </script>
 </body>
 </html>
