@@ -31,6 +31,12 @@ $khmer_months = [
     '05' => 'ឧសភា', '06' => 'មិថុនា', '07' => 'កក្កដា', '08' => 'សីហា',
     '09' => 'កញ្ញា', '10' => 'តុលា', '11' => 'វិច្ឆិកា', '12' => 'ធ្នូ'
 ];
+
+// Generate QR Code URL
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+$current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($current_url);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -113,7 +119,11 @@ $khmer_months = [
             ?>
         </div>
         
-        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: flex-end; padding-right: 60px;">
+        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: space-between; padding: 0 60px; align-items: flex-end;">
+            <div>
+                <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code for verification" style="width:100px; height:100px;">
+                <p style="font-size:10px; color:#555; margin-top:5px; text-align:center;">Scan to Verify</p>
+            </div>
             <div style="text-align: center;">
                 <div class="date-range" style="font-family: 'Khmer OS'; margin-top: 0; margin-bottom: 10px; font-size: 16px; color: #040e7c;">
                     <?php 

@@ -31,6 +31,11 @@ $khmer_months = [
     '05' => 'ឧសភា', '06' => 'មិថុនា', '07' => 'កក្កដា', '08' => 'សីហា',
     '09' => 'កញ្ញា', '10' => 'តុលា', '11' => 'វិច្ឆិកា', '12' => 'ធ្នូ'
 ];
+
+// Generate QR Code URL
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+$current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($current_url);
 ?>
 <!DOCTYPE html>
 <html>
@@ -113,7 +118,11 @@ $khmer_months = [
             ?>
         </div>
         
-        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: flex-end; padding-right: 60px;">
+        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: space-between; padding: 0 60px; align-items: flex-end;">
+            <div>
+                <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code for verification" style="width:100px; height:100px;">
+                <p style="font-size:10px; color:#555; margin-top:5px; text-align:center;">Scan to Verify</p>
+            </div>
             <div style="text-align: center;">
                 <div class="date-range" style="font-family: 'Khmer OS'; margin-top: 0; margin-bottom: 10px; font-size: 16px; color: #040e7c;">
                     <?php 
@@ -130,16 +139,6 @@ $khmer_months = [
             </div>
         </div>
         
-        <?php
-        // Generate QR Code URL pointing to the current page
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $currentLink = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($currentLink);
-        ?>
-        <div style="position: absolute; bottom: 90px; left: 90px; text-align: center;">
-            <img src="<?php echo $qrCodeUrl; ?>" alt="Scan to Verify" style="width: 90px; height: 90px; border: 1px solid #eee; padding: 2px;">
-            <div style="font-size: 10px; margin-top: 2px; font-family: Arial; color: #333;">Scan to Verify</div>
-        </div>
 
         <div class="no-print" style="margin-top: 40px;">
             <button onclick="window.print()" style="padding: 12px 24px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 16px;">Print Certificate</button>
