@@ -80,7 +80,7 @@ $page = $_GET['page'] ?? 'home';
             <a href="courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> <?php echo $lang['course']; ?></a>
             <a href="time/grades.php"><i class="fa-solid fa-clock"></i> <?php echo $lang['grades']; ?></a>
             <a href="invoice/invoice.php"><i class="fa-solid fa-file-invoice-dollar"></i> <?php echo $lang['invoices']; ?></a>
-             <a href="students/finished_student.php"><i class="fa-solid fa-user-check"></i> <?php echo $lang['finished_students']; ?></a>
+             <a href="students/finished.php"><i class="fa-solid fa-user-check"></i> <?php echo $lang['finished_students']; ?></a>
             <a href="invoice/paid.php"><i class="fa-solid fa-file-invoice"></i> <?php echo $lang['paid_list']; ?></a>
             <a href="schools/add_school.php"><i class="fa-solid fa-school"></i> <?php echo $lang['schools']; ?></a>
             <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
