@@ -73,7 +73,8 @@ if (isset($_SESSION['user'])) {
             <nav class="navbar">
                 <div class="nav-links">
                     <a href="index.php">Home</a>
-                    <a href="#">About Me</a>
+                    <a href="index.php">Student</a>
+                    <a href="#">about me</a>
                 </div>
                 <a href="login.php" class="btn">ចូលប្រើ ប្រព័ន្ទ (Login)</a>
             </nav>
