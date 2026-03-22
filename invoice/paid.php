@@ -194,6 +194,7 @@ $result = $stmt->get_result();
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
                         <select name="filter_school" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                             <option value="">All Schools</option>
                             <?php foreach ($schools as $school): ?>
@@ -202,6 +203,7 @@ $result = $stmt->get_result();
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <?php endif; ?>
                         <select name="filter_period" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                             <option value="">All Periods</option>
                             <?php foreach ($periods as $p): ?>

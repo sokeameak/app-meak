@@ -8,6 +8,17 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+// Get current user's school_id
+$user_school_id = 0;
+$stmt = $conn->prepare("SELECT school_id FROM tb_users WHERE username = ?");
+$stmt->bind_param("s", $_SESSION['user']);
+$stmt->execute();
+$resUser = $stmt->get_result();
+if ($rowUser = $resUser->fetch_assoc()) {
+    $user_school_id = $rowUser['school_id'];
+}
+$stmt->close();
+
 $student_id = $_GET['id'] ?? '';
 $error = '';
 $success = '';
@@ -47,7 +58,11 @@ if (empty($student_id)) {
 
 // Fetch schools
 $schools = [];
-$schoolRes = $conn->query("SELECT * FROM tb_schools");
+$sqlSchools = "SELECT * FROM tb_schools";
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
+    $sqlSchools .= " WHERE id = " . $user_school_id;
+}
+$schoolRes = $conn->query($sqlSchools);
 if($schoolRes) {
     while($r = $schoolRes->fetch_assoc()) $schools[] = $r;
 }

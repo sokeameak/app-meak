@@ -1,9 +1,9 @@
 <?php
 session_start();
-include '../db_connect.php';
+include 'db_connect.php';
 
 $id = $_GET['id'] ?? '';
-if (empty($id)) die("Invalid ID");
+if (empty($id) || !is_numeric($id)) die("Invalid or missing ID");
 
 // Fetch details
 $sql = "SELECT st.ID, st.student_name, st.sex, st.dob, st.photo, c.Course, s.start_date, s.end_date, sch.school_name, sch.school_name_kh, sch.logo 
@@ -28,10 +28,7 @@ $khmer_months = [
 
 // Generate QR Code URL
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
-// Point to root view_certificate.php
-$root_path = dirname(dirname($_SERVER['PHP_SELF']));
-$root_path = str_replace('\\', '/', $root_path); // Ensure forward slashes for URL
-$target_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $root_path . "/view_certificate.php?id=" . $id;
+$target_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?id=" . $id;
 $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($target_url);
 ?>
 <!DOCTYPE html>
@@ -40,7 +37,7 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
 <title>Certificate - <?php echo htmlspecialchars($data['student_name']); ?></title>
 <style>
     body { font-family: Arial, 'Khmer OS', sans-serif; background: #f0f0f0; text-align: center; padding: 50px; }
-    .certificate { width: 800px; margin: 0 auto; background: white url('../logo/border.jpg') no-repeat center center; background-size: 100% 100%; padding: 100px; position: relative; box-shadow: 0 0 20px rgba(6, 3, 215, 0.1); }
+    .certificate { width: 800px; margin: 0 auto; background: white url('logo/border.jpg') no-repeat center center; background-size: 100% 100%; padding: 100px; position: relative; box-shadow: 0 0 20px rgba(6, 3, 215, 0.1); }
     .header { font-size: 40px; font-weight: bold; color: #150581; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
     .sub-header { font-size: 20px; margin-bottom: 40px; font-style: italic; color: #ff0000; }
     .name { font-size: 20px;  border-bottom: 2px solid #d80000; display: inline-block; padding: 0 40px; margin: 20px 0; color: #2c3e50; }
@@ -56,7 +53,7 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
     
     @media print {
         body { background: white; padding: 0; margin: 0;color: black; }
-        .certificate { background: white url('../logo/border.jpg') no-repeat center center !important; background-size: 100% 100% !important; -webkit-print-color-adjust: exact; width: 100%; height: 100vh; box-shadow: none; box-sizing: border-box; margin: 0;text-align: center; }
+        .certificate { background: white url('logo/border.jpg') no-repeat center center !important; background-size: 100% 100% !important; -webkit-print-color-adjust: exact; width: 100%; height: 100vh; box-shadow: none; box-sizing: border-box; margin: 0;text-align: center; }
         .no-print { display: none; }
         .header{ font-size: 32px;font-family: 'Khmer OS Muol light';}
         .name{ font-size: 20px;font-family: 'Khmer OS Muol light';color:red;}
@@ -66,16 +63,15 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
         .give{ font-size: 24px;font-family: 'Khmer OS Muol light';}
         .body-text{ font-size: 25px;font-family: 'Khmer OS';}
     }
-   
 </style>
 </head>
 <body>
     <div class="certificate">
-       <img src="../logo/<?php echo htmlspecialchars($data['logo'] ?? 'meakea.jpg'); ?>" alt="Logo" style="width: 100px; margin-bottom: 10px;text-align:left;position:absolute;top:120px;left:90px;">
+       <img src="logo/<?php echo htmlspecialchars($data['logo'] ?? 'meakea.jpg'); ?>" alt="Logo" style="width: 100px; margin-bottom: 10px;text-align:left;position:absolute;top:120px;left:90px;">
        <div style="position:absolute; top:200px; left:90px; width:100px; text-align:center; font-family: 'Khmer OS Muol light'; font-size: 12px; color: #150581;"><?php echo htmlspecialchars($data['school_name_kh'] ?? 'មាគ៌ាកុំព្យូទ័រ'); ?></div>
       
        <?php if (!empty($data['photo'])): ?>
-           <img src="../uploads/<?php echo htmlspecialchars($data['photo']); ?>" alt="Student Photo" style="width: 100px; height: 120px; object-fit: cover; position: absolute; top: 120px; right: 100px; border: 1px solid #ddd;">
+           <img src="uploads/<?php echo htmlspecialchars($data['photo']); ?>" alt="Student Photo" style="width: 100px; height: 120px; object-fit: cover; position: absolute; top: 120px; right: 100px; border: 1px solid #ddd;">
        <?php endif; ?>
        <div style="position: absolute; top:235px; right: 110px; width: 90px; text-align: center; font-weight: bold; font-size: 14px; color: #000;">លេខ: <?php echo htmlspecialchars(str_pad($data['ID'], 6, '0', STR_PAD_LEFT)); ?></div>
        <h1 class="header"​ style="font-family: 'Khmer OS Muol light';font-size: 30px;">លិខិតបញ្ជាក់ការសិក្សា</h1>
@@ -131,14 +127,9 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
                     ?>
                 </div>
                 <div class="sig-title" style="font-family: 'Khmer OS Muol Light';">គណៈគ្រប់គ្រង</div>
-                <img src="../logo/meakea.png" alt="Signature" id="sigImage" style="width: 120px; margin: 5px auto;">
+                <img src="logo/meakea.png" alt="Signature" style="width: 120px; margin: 5px auto;">
                 <h2 style="font-family: 'Khmer OS Muol Light'; color: #a50000; margin: 0;">មាគ គា</h2>
             </div>
-        </div>
-        
-
-        <div class="no-print" style="margin-top: 40px;">
-            <button onclick="window.print()" style="padding: 12px 24px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 16px;">Print Certificate</button>
         </div>
     </div>
 </body>

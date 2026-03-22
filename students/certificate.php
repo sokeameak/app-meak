@@ -2,12 +2,6 @@
 session_start();
 include '../db_connect.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
-}
-
 $id = $_GET['id'] ?? '';
 if (empty($id)) die("Invalid ID");
 
@@ -34,8 +28,11 @@ $khmer_months = [
 
 // Generate QR Code URL
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
-$current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($current_url);
+// Point to root view_certificate.php
+$root_path = dirname(dirname($_SERVER['PHP_SELF']));
+$root_path = str_replace('\\', '/', $root_path); // Ensure forward slashes for URL
+$target_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $root_path . "/view_certificate.php?id=" . $id;
+$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($target_url);
 
 ?>
 <!DOCTYPE html>

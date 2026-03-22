@@ -20,6 +20,7 @@ if ($rowUser = $resUser->fetch_assoc()) {
 $stmt->close();
 
 $page = $_GET['page'] ?? 'home';
+$view = $_GET['view'] ?? 'table';
 ?>
 
 <!DOCTYPE html>
@@ -161,54 +162,170 @@ $page = $_GET['page'] ?? 'home';
 
                     $sql = "SELECT s.*, (SELECT SUM(amount) FROM tb_invoices WHERE student_name = s.student_name AND status = 'Paid') as total_paid, (SELECT SUM(price) FROM tb_study WHERE id_stu = s.ID) as total_study_price, (SELECT GROUP_CONCAT(t.time SEPARATOR ', ') FROM tb_study st JOIN tb_time t ON st.id_time = t.id WHERE st.id_stu = s.ID) as study_times FROM tb_students s $whereClause ORDER BY ID DESC";
                     $result = $conn->query($sql);
+
+                    // --- Dashboard Statistics ---
+                    $currentMonth = date('m');
+                    $currentYear = date('Y');
+                    
+                    // Base Where for Stats (School restriction)
+                    $statsWhere = "WHERE 1=1";
+                    if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
+                        $statsWhere .= " AND s.school_id = $user_school_id";
+                    } elseif (!empty($filter_school)) {
+                        $statsWhere .= " AND s.school_id = " . intval($filter_school);
+                    }
+
+                    // 1. Total Students
+                    $sqlCount = "SELECT COUNT(*) as count FROM tb_students s $statsWhere";
+                    $resCount = $conn->query($sqlCount);
+                    $totalStudents = $resCount->fetch_assoc()['count'] ?? 0;
+
+                    // 2. Active Students
+                    $sqlActive = "SELECT COUNT(DISTINCT s.ID) as count FROM tb_students s JOIN tb_study st ON s.ID = st.id_stu $statsWhere AND st.end_date > CURDATE()";
+                    $resActive = $conn->query($sqlActive);
+                    $activeStudents = $resActive->fetch_assoc()['count'] ?? 0;
+
+                    // 3. Monthly Income (Joined with students to respect school filter)
+                    $sqlIncome = "SELECT SUM(i.amount) as total FROM tb_invoices i JOIN tb_students s ON i.student_name = s.student_name $statsWhere AND i.status = 'Paid' AND MONTH(i.created_at) = $currentMonth AND YEAR(i.created_at) = $currentYear";
+                    $resIncome = $conn->query($sqlIncome);
+                    $monthlyIncome = $resIncome->fetch_assoc()['total'] ?? 0;
+
+                    // Display Stats Cards
+                    echo '<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;"> <div class="card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;"> <h3>Total Students</h3> <p style="font-size: 2em; font-weight: bold;">' . $totalStudents . '</p> </div> <div class="card" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;"> <h3>Active Students</h3> <p style="font-size: 2em; font-weight: bold;">' . $activeStudents . '</p> </div> <div class="card" style="background: linear-gradient(135deg, #f1c40f, #f39c12); color: white;"> <h3>Income (' . date('M') . ')</h3> <p style="font-size: 2em; font-weight: bold;">$' . number_format($monthlyIncome, 2) . '</p> </div> </div>';
+
                     echo '<div class="card"><h2>Student Overview</h2>';
-                    echo '<form method="GET" style="margin-bottom: 20px;">';
+
+                    // --- Filter and View Switcher Bar ---
+                    echo '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">';
+                    
+                    // Filter Form
+                    echo '<form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">';
                     echo '<input type="hidden" name="page" value="home">';
                     echo '<input type="hidden" name="filter" value="1">';
-                    echo '<select name="filter_school" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px; margin-right: 15px;">';
-                    echo '<option value="">All Schools</option>';
-                    foreach ($schools as $s) {
-                        $selected = ($filter_school == $s['id']) ? 'selected' : '';
-                        echo "<option value='{$s['id']}' $selected>{$s['school_name']}</option>";
+                    echo '<input type="hidden" name="view" value="'.htmlspecialchars($view).'">'; // Preserve view on filter
+                    
+                    if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) {
+                        echo '<select name="filter_school" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">';
+                        echo '<option value="">All Schools</option>';
+                        foreach ($schools as $s) {
+                            $selected = ($filter_school == $s['id']) ? 'selected' : '';
+                            echo "<option value='{$s['id']}' $selected>{$s['school_name']}</option>";
+                        }
+                        echo '</select>';
                     }
-                    echo '</select>';
-                    echo '<select name="filter_time" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px; margin-right: 15px;">';
+                    
+                    echo '<select name="filter_time" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">';
                     echo '<option value="">All Times</option>';
                     foreach ($times as $t) {
                         $selected = ($filter_time == $t['id']) ? 'selected' : '';
                         echo "<option value='{$t['id']}' $selected>{$t['time']}</option>";
                     }
                     echo '</select>';
-                    echo '<label style="margin-right: 15px; font-weight: bold; color: #2c3e50;"><input type="checkbox" name="chk_studying" ' . ($chk_studying ? 'checked' : '') . '> Studying</label>';
-                    echo '<label style="margin-right: 15px; font-weight: bold; color: #2c3e50;"><input type="checkbox" name="chk_finished" ' . ($chk_finished ? 'checked' : '') . '> Finished</label>';
+                    
+                    echo '<label style="font-weight: bold; color: #2c3e50;"><input type="checkbox" name="chk_studying" ' . ($chk_studying ? 'checked' : '') . '> Studying</label>';
+                    echo '<label style="font-weight: bold; color: #2c3e50;"><input type="checkbox" name="chk_finished" ' . ($chk_finished ? 'checked' : '') . '> Finished</label>';
                     echo '<button type="submit" class="btn" style="padding: 5px 10px; font-size: 14px;">Filter</button>';
                     echo '</form>';
-                    echo '<div class="student-grid">';
-                    if ($result && $result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo '<div class="student-card">';
-                            echo '<a href="invoice/invoice.php?search=' . urlencode($row['student_name']) . '">';
-                            if (!empty($row['photo'])) {
-                                echo '<img src="uploads/' . htmlspecialchars($row['photo']) . '" alt="Student Photo" class="student-photo">';
-                            } else {
-                                echo '<div class="student-photo" style="display: flex; align-items: center; justify-content: center; background: #eee; color: #7f8c8d;">';
-                                echo 'Add Photo';
-                                echo '</div>';
+
+                    // View Switcher
+                    echo '<div>';
+                    $queryParams = $_GET;
+                    $queryParams['view'] = 'table';
+                    $tableViewUrl = '?' . http_build_query($queryParams);
+                    $queryParams['view'] = 'card';
+                    $cardViewUrl = '?' . http_build_query($queryParams);
+
+                    $tableBtnStyle = ($view == 'table') ? 'background: #2980b9;' : 'background: #bdc3c7;';
+                    $cardBtnStyle = ($view == 'card') ? 'background: #2980b9;' : 'background: #bdc3c7;';
+                    echo '<a href="'.$tableViewUrl.'" class="btn" style="text-decoration: none; padding: 8px 12px; '.$tableBtnStyle.'" title="Table View"><i class="fa-solid fa-table-list"></i></a>';
+                    echo '<a href="'.$cardViewUrl.'" class="btn" style="text-decoration: none; padding: 8px 12px; '.$cardBtnStyle.'" title="Card View"><i class="fa-solid fa-grip"></i></a>';
+                    echo '</div>';
+
+                    echo '</div>'; // End of filter/view bar
+                    
+                    // --- Conditional Rendering ---
+                    if ($view == 'card') {
+                        // Card View
+                        echo '<div class="student-grid">';
+                        if ($result && $result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '<div class="student-card">';
+                                echo '<a href="invoice/invoice.php?search=' . urlencode($row['student_name']) . '">';
+                                if (!empty($row['photo'])) {
+                                    echo '<img src="uploads/' . htmlspecialchars($row['photo']) . '" alt="Student Photo" class="student-photo">';
+                                } else {
+                                    echo '<div class="student-photo" style="display: flex; align-items: center; justify-content: center; background: #eee; color: #7f8c8d; font-size: 1.5em;">';
+                                    echo 'No Photo';
+                                    echo '</div>';
+                                }
+                                echo '</a>';
+                                echo '<div class="student-info">';
+                                echo '<h3>' . htmlspecialchars($row['student_name']) . '</h3>';
+                                echo '<p>Time: ' . htmlspecialchars($row['study_times'] ?? 'N/A') . '</p>';
+                                $price = $row['total_study_price'] ?? 0;
+                                $paid = $row['total_paid'] ?? 0;
+                                $remain = $price - $paid;
+                                $remainColor = $remain > 0 ? '#c0392b' : '#27ae60';
+                                echo '<p style="color: #e67e22; font-weight: bold;">Price: $' . number_format($price, 2) . '</p>';
+                                echo '<p><a href="invoice/paid.php?search=' . urlencode($row['student_name']) . '" style="color: #27ae60; font-weight: bold; text-decoration: none;">Paid: $' . number_format($paid, 2) . '</a></p>';
+                                echo '<p style="color: '.$remainColor.'; font-weight: bold;">Remain: $' . number_format($remain, 2) . '</p>';
+                                echo '</div></div>';
                             }
-                            echo '</a>';
-                            echo '<div class="student-info">';
-                            echo '<h3>' . htmlspecialchars($row['student_name']) . '</h3>';
-                            //echo '<p>ID: ' . htmlspecialchars($row['ID']?? '') . '</p>';
-                            echo '<p>'  . htmlspecialchars($row['dob']) . '</p>';
-                            echo '<p>Time: ' . htmlspecialchars($row['study_times'] ?? 'N/A') . '</p>';
-                            echo '<p style="color: #e67e22; font-weight: bold;">Study Price: $' . number_format($row['total_study_price'] ?? 0, 2) . '</p>';
-                            echo '<p><a href="invoice/paid.php?search=' . urlencode($row['student_name']) . '" style="color: #27ae60; font-weight: bold; text-decoration: none;">Paid: $' . number_format($row['total_paid'] ?? 0, 2) . '</a></p>';
-                            echo '</div></div>';
+                        } else {
+                            echo '<p>No students found matching the criteria.</p>';
                         }
+                        echo '</div>'; // end student-grid
                     } else {
-                        echo '<p>No students found.</p>';
+                        // Table View (default)
+                        echo '<div style="overflow-x: auto;">';
+                        echo '<table style="width: 100%; border-collapse: collapse; margin-top: 10px; background: white;">';
+                        echo '<thead>';
+                        echo '<tr style="background: #2c3e50; color: white; text-align: left;">';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Photo</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Student Name</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Sex</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">DOB</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Time</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Price</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Paid</th>';
+                        echo '<th style="padding: 12px; border-bottom: 2px solid #ddd;">Remain</th>';
+                        echo '</tr>';
+                        echo '</thead>';
+                        echo '<tbody>';
+
+                        if ($result && $result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $price = $row['total_study_price'] ?? 0;
+                                $paid = $row['total_paid'] ?? 0;
+                                $remain = $price - $paid;
+                                $sex = $row['sex'] ?? '';
+                                if ($sex == 'Male') $sex = 'ប្រុស';
+                                elseif ($sex == 'Female') $sex = 'ស្រី';
+
+                                echo '<tr style="border-bottom: 1px solid #eee;">';
+                                echo '<td style="padding: 8px;"><a href="invoice/invoice.php?search=' . urlencode($row['student_name']) . '">';
+                                if (!empty($row['photo'])) {
+                                    echo '<img src="uploads/' . htmlspecialchars($row['photo']) . '" alt="Img" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; vertical-align: middle;">';
+                                } else {
+                                    echo '<div style="width: 40px; height: 40px; background: #ecf0f1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #7f8c8d;">No Pic</div>';
+                                }
+                                echo '</a></td>';
+                                echo '<td style="padding: 8px;"><a href="invoice/invoice.php?search=' . urlencode($row['student_name']) . '" style="text-decoration: none; color: #2c3e50; font-weight: bold;">' . htmlspecialchars($row['student_name']) . '</a></td>';
+                                echo '<td style="padding: 8px;">' . htmlspecialchars($sex) . '</td>';
+                                echo '<td style="padding: 8px;">' . htmlspecialchars($row['dob']) . '</td>';
+                                echo '<td style="padding: 8px;">' . htmlspecialchars($row['study_times'] ?? '') . '</td>';
+                                echo '<td style="padding: 8px; color: #e67e22; font-weight: bold;">$' . number_format($price, 2) . '</td>';
+                                echo '<td style="padding: 8px;"><a href="invoice/paid.php?search=' . urlencode($row['student_name']) . '" style="color: #27ae60; font-weight: bold; text-decoration: none;">$' . number_format($paid, 2) . '</a></td>';
+                                $remainColor = $remain > 0 ? '#c0392b' : '#27ae60';
+                                echo '<td style="padding: 8px; color: ' . $remainColor . '; font-weight: bold;">$' . number_format($remain, 2) . '</td>';
+                                echo '</tr>';
+                            }
+                        } else {
+                            echo '<tr><td colspan="8" style="padding: 20px; text-align: center; color: #7f8c8d;">No students found matching the criteria.</td></tr>';
+                        }
+                        echo '</tbody></table></div>';
                     }
-                    echo '</div></div>';
+                    echo '</div>';
                     break;
                 case 'students':
                     echo '<div class="card"><h2>Student List</h2>';

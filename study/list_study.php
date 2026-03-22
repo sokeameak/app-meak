@@ -8,6 +8,17 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+// Get current user's school_id
+$user_school_id = 0;
+$stmt = $conn->prepare("SELECT school_id FROM tb_users WHERE username = ?");
+$stmt->bind_param("s", $_SESSION['user']);
+$stmt->execute();
+$resUser = $stmt->get_result();
+if ($rowUser = $resUser->fetch_assoc()) {
+    $user_school_id = $rowUser['school_id'];
+}
+$stmt->close();
+
 $message = '';
 $error = '';
 if (isset($_GET['message'])) $message = $_GET['message'];
@@ -44,12 +55,21 @@ LEFT JOIN tb_course c ON s.id_code = c.ID
 LEFT JOIN tb_schools sch ON st.school_id = sch.id
 ";
 
+$whereClauses = [];
 if (!empty($search_date)) {
-    $sql .= " WHERE s.start_date = '" . $conn->real_escape_string($search_date) . "'";
+    $whereClauses[] = "s.start_date = '" . $conn->real_escape_string($search_date) . "'";
 } elseif ($show_all) {
     // Show all records
 } else {
-    $sql .= " WHERE s.end_date > CURDATE()";
+    $whereClauses[] = "s.end_date > CURDATE()";
+}
+
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
+    $whereClauses[] = "st.school_id = " . $user_school_id;
+}
+
+if (!empty($whereClauses)) {
+    $sql .= " WHERE " . implode(" AND ", $whereClauses);
 }
 
 $sql .= " GROUP BY s.id ORDER BY s.id DESC";
