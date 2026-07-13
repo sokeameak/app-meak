@@ -7,11 +7,16 @@ if (empty($id)) die("Invalid ID");
 
 // Fetch details
 $sql = "SELECT st.ID, st.student_name, st.sex, st.dob, st.photo, c.Course, s.start_date, s.end_date, sch.school_name, sch.school_name_kh, sch.logo 
-        FROM tb_study s 
-        JOIN tb_students st ON s.id_stu = st.ID 
-        JOIN tb_course c ON s.id_code = c.ID 
-        LEFT JOIN tb_schools sch ON st.school_id = sch.id
-        WHERE s.id = ?";
+      FROM tb_study s 
+       JOIN tb_students st ON s.id_stu = st.ID 
+       JOIN tb_course c ON s.id_code = c.ID 
+       LEFT JOIN tb_schools sch ON st.school_id = sch.id
+   
+       WHERE s.id = ?";
+
+
+
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -97,7 +102,7 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
     </div>
         
         <div class="body-text">
-        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';">រដ្ឋបាលទូទៅ និង អ៊ិនធឺណែត </b>ដោយជោគជ័យ។
+        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';"><?php echo htmlspecialchars($data['Course'] ?? ''); ?> </b>ដោយជោគជ័យ។
         </div>
         
         <div class="study-date" style="font-family: 'Khmer OS'; font-size: 18px; margin-top: 10px;">
