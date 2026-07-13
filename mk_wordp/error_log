@@ -1,0 +1,7 @@
+[09-Jun-2026 09:52:50 UTC] MonsterInsights: Running migration 1.0.0-cache-table: Create custom cache table for improved performance
+[09-Jun-2026 09:52:50 UTC] MonsterInsights: Migration 1.0.0-cache-table completed successfully in 0.02 seconds
+[09-Jun-2026 09:52:50 UTC] MonsterInsights: Running migration 1.0.1-remove-per-user-cache: Remove per-user cache metadata (switched to site-wide cache)
+[09-Jun-2026 09:52:50 UTC] MonsterInsights: Migration 1.0.1-remove-per-user-cache completed successfully in 0.00 seconds
+[09-Jun-2026 09:54:07 UTC] Cron reschedule event error for hook: monsterinsights_feature_feedback_clear_expired, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"weekly","args":[],"interval":604800}
+[09-Jun-2026 09:54:07 UTC] Cron unschedule event error for hook: monsterinsights_feature_feedback_clear_expired, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"weekly","args":[],"interval":604800}
+[09-Jun-2026 09:54:11 UTC] Cron reschedule event error for hook: monsterinsights_feature_feedback_clear_expired, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"weekly","args":[],"interval":604800}

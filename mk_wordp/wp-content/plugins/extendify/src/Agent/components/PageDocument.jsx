@@ -1,0 +1,29 @@
+import { selectedContent } from '@agent/icons';
+import { useQuickEditStore } from '@quick-edit/state/store';
+import { __ } from '@wordpress/i18n';
+import { close, Icon } from '@wordpress/icons';
+
+export const PageDocument = ({ busy }) => {
+	const setBlock = useQuickEditStore((s) => s.setAgentBlock);
+	return (
+		<div className="flex w-fit items-center justify-start gap-1 rounded-sm border border-gray-500 bg-gray-100 p-1 text-sm text-gray-900">
+			<div className="flex items-center gap-1">
+				<Icon icon={selectedContent} />
+				<div>{__('Selected content', 'extendify-local')}</div>
+			</div>
+			<button
+				type="button"
+				disabled={busy}
+				className="flex h-full items-center rounded-none border-0 bg-transparent outline-hidden ring-design-main focus:shadow-none focus:outline-hidden focus-visible:outline-design-main"
+				onClick={() => setBlock(null)}
+			>
+				<Icon
+					className="pointer-events-none fill-current leading-none"
+					icon={close}
+					size={18}
+				/>
+				<span className="sr-only">{__('Remove', 'extendify-local')}</span>
+			</button>
+		</div>
+	);
+};
