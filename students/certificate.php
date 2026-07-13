@@ -98,7 +98,7 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
     </div>
         
         <div class="body-text">
-        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';">រដ្ឋបាលទូទៅ និង អ៊ិនធឺណែត </b>ដោយជោគជ័យ។
+        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';">រដ្ឋបាលទូទៅ និង អ៊ិនធឺណែត ត្រូវកែ </b>ដោយជោគជ័យ។
         </div>
         
         <div class="study-date" style="font-family: 'Khmer OS'; font-size: 18px; margin-top: 10px;">
