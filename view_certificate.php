@@ -11,6 +11,7 @@ $sql = "SELECT st.ID, st.student_name, st.sex, st.dob, st.photo, c.Course, s.sta
         JOIN tb_students st ON s.id_stu = st.ID 
         JOIN tb_course c ON s.id_code = c.ID 
         LEFT JOIN tb_schools sch ON st.school_id = sch.id
+         
         WHERE s.id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
@@ -67,7 +68,7 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
 </head>
 <body>
     <div class="certificate">
-       <img src="logo/<?php echo htmlspecialchars($data['logo'] ?? 'meakea.jpg'); ?>" alt="Logo" style="width: 100px; margin-bottom: 10px;text-align:left;position:absolute;top:120px;left:90px;">
+       <img src="logo/<?php echo htmlspecialchars($data['logo'] ?? 'meakea.png'); ?>" alt="Logo" style="width: 100px; margin-bottom: 10px;text-align:left;position:absolute;top:120px;left:90px;">
        <div style="position:absolute; top:200px; left:90px; width:100px; text-align:center; font-family: 'Khmer OS Muol light'; font-size: 12px; color: #150581;"><?php echo htmlspecialchars($data['school_name_kh'] ?? 'មាគ៌ាកុំព្យូទ័រ'); ?></div>
       
        <?php if (!empty($data['photo'])): ?>
@@ -78,22 +79,24 @@ $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . 
        
         <h2 class="give" style="font-family: 'Khmer OS Muol light';">សូមផ្ដល់ជូន</h2>
         <div class="name" style="font-family: 'Khmer OS Muol light';">
-            <label class="lname">ឈ្មោះសិស្ស</label>
-            <?php echo htmlspecialchars($data['student_name']); ?>
+            <label class="lname">ឈ្មោះសិស្ស</label><b style="font-family: 'Khmer Muol light';color:red;">
+            <?php echo htmlspecialchars($data['student_name']); ?></b>
             <label class="lsex">ភេទ</label>
-            <?php echo htmlspecialchars($data['sex'] === 'Male' ? 'ប្រុស' : ($data['sex'] === 'Female' ? 'ស្រី' : $data['sex'])); ?>
+            <b style="font-family: 'Khmer Muol light';color:red;">
+            <?php echo htmlspecialchars($data['sex'] === 'Male' ? 'ប្រុស' : ($data['sex'] === 'Female' ? 'ស្រី' : $data['sex'])); ?></b>
             <label class="ldob">ថ្ងៃខែឆ្នំាកំណើត</label>
+            <b style="font-family: 'Khmer Muol light';color:red;">
             <?php 
                 $dob_ts = strtotime($data['dob']);
                 $khmer_nums = ['0'=>'០', '1'=>'១', '2'=>'២', '3'=>'៣', '4'=>'៤', '5'=>'៥', '6'=>'៦', '7'=>'៧', '8'=>'៨', '9'=>'៩'];
                 $day = strtr(date('d', $dob_ts), $khmer_nums);
                 $year = strtr(date('Y', $dob_ts), $khmer_nums);
                 echo $day . ' ' . $khmer_months[date('m', $dob_ts)] . ' ' . $year; 
-            ?>
+            ?></b>
     </div>
         
         <div class="body-text">
-        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';">រដ្ឋបាលទូទៅ និង អ៊ិនធឺណែត </b>ដោយជោគជ័យ។
+        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';color:red;"><?php echo htmlspecialchars($data['Course'] ?? ''); ?></b>ដោយជោគជ័យ។
         </div>
         
         <div class="study-date" style="font-family: 'Khmer OS'; font-size: 18px; margin-top: 10px;">
