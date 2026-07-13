@@ -182,7 +182,7 @@ if ($certResult) {
     <div id="loginModal" class="modal">
     <div class="login-card">
         <span onclick="document.getElementById('loginModal').style.display='none'" class="close-modal">&times;</span>
-        <h2​ style="font-family: 'Khmer OS Muol light';font-size: 30px;color: #1a0285;">មាគ៌ាកុំព្យូទ័រ កែ </h2>
+        <h2​ style="font-family: 'Khmer OS Muol light';font-size: 30px;color: #1a0285;">មាគ៌ាកុំព្យូទ័រ</h2>
         <hr>
         <?php if ($error): ?>
             <div class="error"><?php echo htmlspecialchars($error); ?></div>
