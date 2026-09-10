@@ -1,34 +1,35 @@
 <?php
-session_start();
-include '../db_connect.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
+// time/delete_time.php - Safely Delete Time Slot
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+require_once __DIR__ . '/../db_connect.php';
+require_login();
 
-// Get the ID from URL
-$id = $_GET['id'] ?? '';
+$id = intval($_GET['id'] ?? 0);
 
-if (empty($id)) {
-    header("Location: time/grades.php");
-    exit;
-}
+if ($id > 0) {
+    $stmtCount = $conn->prepare("SELECT COUNT(*) as count FROM tb_study WHERE id_time = ?");
+    $stmtCount->bind_param("i", $id);
+    $stmtCount->execute();
+    $studyCount = $stmtCount->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmtCount->close();
 
-// Delete from database
-$sql = "DELETE FROM tb_time WHERE id = ?";
-$stmt = $conn->prepare($sql);
-
-if ($stmt) {
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        log_siem_event($conn, $_SESSION['user'], 'DELETE_TIME', "Deleted time slot ID: $id");
+    if ($studyCount > 0) {
+        set_flash('danger', "មិនអាចលុបម៉ោងនេះបានទេ ព្រោះមានសិស្សកំពុងសិក្សាចំនួន $studyCount នាក់!");
+    } else {
+        $stmtDel = $conn->prepare("DELETE FROM tb_time WHERE id = ?");
+        if ($stmtDel) {
+            $stmtDel->bind_param("i", $id);
+            if ($stmtDel->execute()) {
+                log_siem_event($conn, get_logged_user(), 'DELETE_TIME_SLOT', "Deleted time slot ID: $id");
+                set_flash('success', $lang['deleted_success']);
+            }
+            $stmtDel->close();
+        }
     }
-    $stmt->close();
 }
 
-// Redirect back to grades page
 header("Location: grades.php");
 exit;
 ?>

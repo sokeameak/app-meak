@@ -1,165 +1,147 @@
 <?php
-session_start();
-include '../db_connect.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
+// users/edit_user.php - Edit User Account
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+require_once __DIR__ . '/../db_connect.php';
+require_admin();
 
-// Check if admin
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 1) {
-    header("Location: ../dashboard.php");
-    exit;
-}
+$page_title = $lang['edit'] . ' ' . $lang['users'];
+$page_subtitle = $lang['app_name'];
 
-$id = $_GET['id'] ?? '';
-$error = '';
-$success = '';
-
-if (empty($id)) {
+$id = intval($_GET['id'] ?? 0);
+if ($id <= 0) {
+    set_flash('danger', 'Invalid user ID');
     header("Location: add_users.php");
     exit;
 }
 
-// Fetch user data
-$user = [];
+// Fetch User
 $stmt = $conn->prepare("SELECT * FROM tb_users WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$result = $stmt->get_result();
-if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
-} else {
-    die("User not found.");
-}
+$res = $stmt->get_result();
+$targetUser = $res->fetch_assoc();
 $stmt->close();
 
-// Fetch Schools for dropdown
-$schools = [];
-$schoolRes = $conn->query("SELECT * FROM tb_schools");
-if($schoolRes) {
-    while($r = $schoolRes->fetch_assoc()) $schools[] = $r;
+if (!$targetUser) {
+    set_flash('danger', 'User not found');
+    header("Location: add_users.php");
+    exit;
 }
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $user_type = $_POST['user_type'] ?? 0;
-    $school_id = $_POST['school_id'] ?? 0;
+// Fetch Schools
+$schools = [];
+$sRes = $conn->query("SELECT id, school_name, school_name_kh FROM tb_schools ORDER BY school_name");
+if ($sRes) {
+    while ($r = $sRes->fetch_assoc()) $schools[] = $r;
+}
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $user_type = intval($_POST['user_type'] ?? 0);
+    $school_id = intval($_POST['school_id'] ?? 0);
 
     if (empty($username)) {
-        $error = "Username is required!";
+        $error = $lang['fill_required'];
     } else {
-        // Check if username exists (excluding current user)
-        $stmt = $conn->prepare("SELECT id FROM tb_users WHERE username = ? AND id != ?");
-        $stmt->bind_param("si", $username, $id);
-        $stmt->execute();
-        $stmt->store_result();
-        
-        if ($stmt->num_rows > 0) {
-            $error = "Username already exists!";
+        // Check uniqueness
+        $stmtCheck = $conn->prepare("SELECT id FROM tb_users WHERE username = ? AND id != ?");
+        $stmtCheck->bind_param("si", $username, $id);
+        $stmtCheck->execute();
+        if ($stmtCheck->get_result()->num_rows > 0) {
+            $error = "ឈ្មោះអ្នកប្រើ ($username) ត្រូវបានប្រើប្រាស់រួចហើយ!";
         } else {
-            $stmt->close();
-            
             if (!empty($password)) {
-                // Update with password
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE tb_users SET username = ?, password = ?, user_type = ?, school_id = ? WHERE id = ?");
-                $stmt->bind_param("ssiii", $username, $hashed_password, $user_type, $school_id, $id);
+                // Update with new password
+                $hashed = password_hash($password, PASSWORD_DEFAULT);
+                $stmtUp = $conn->prepare("UPDATE tb_users SET username = ?, password = ?, user_type = ?, school_id = ? WHERE id = ?");
+                $stmtUp->bind_param("ssiii", $username, $hashed, $user_type, $school_id, $id);
             } else {
-                // Update without password
-                $stmt = $conn->prepare("UPDATE tb_users SET username = ?, user_type = ?, school_id = ? WHERE id = ?");
-                $stmt->bind_param("siii", $username, $user_type, $school_id, $id);
+                // Update without changing password
+                $stmtUp = $conn->prepare("UPDATE tb_users SET username = ?, user_type = ?, school_id = ? WHERE id = ?");
+                $stmtUp->bind_param("siii", $username, $user_type, $school_id, $id);
             }
 
-            if ($stmt->execute()) {
-                $success = "User updated successfully!";
-                // Refresh data
-                $user['username'] = $username;
-                $user['user_type'] = $user_type;
-                $user['school_id'] = $school_id;
+            if ($stmtUp->execute()) {
+                log_siem_event($conn, get_logged_user(), 'UPDATE_USER', "Updated user ID: $id ($username)");
+                set_flash('success', $lang['saved_success']);
+                header("Location: add_users.php");
+                exit;
             } else {
-                $error = "Error updating user: " . $conn->error;
+                $error = "Error: " . $stmtUp->error;
             }
-            $stmt->close();
+            $stmtUp->close();
         }
+        $stmtCheck->close();
     }
 }
+
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, 'Khmer OS', sans-serif; background: #f4f4f4; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
-        .sidebar a { display: block; padding: 10px; margin: 5px 0; text-decoration: none; color: white; border-radius: 5px; }
-        .sidebar a:hover { background: #34495e; }
-        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; }
-        .main-content { flex: 1; padding: 20px; }
-        .header { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        .btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #2980b9; }
-        .btn-back { background: #95a5a6; }
-        .btn-back:hover { background: #7f8c8d; }
-        .error { color: #c0392b; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-        .success { color: #155724; background: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <h3>Dashboard</h3>
-            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> Home</a>
-            <a href="add_users.php"><i class="fa-solid fa-users-cog"></i> Users</a>
-            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="fa-solid fa-user-pen" style="color: var(--secondary);"></i>
+            <span><?php echo $page_title; ?>: <?php echo htmlspecialchars($targetUser['username']); ?></span>
         </div>
-
-        <div class="main-content">
-            <div class="header">
-                <h1>Edit User</h1>
-            </div>
-
-            <div class="card">
-                <?php if ($error): ?><div class="error"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
-                <?php if ($success): ?><div class="success"><?php echo htmlspecialchars($success); ?></div><?php endif; ?>
-                <form method="POST">
-                    <div class="form-group"><label>Username</label><input type="text" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required></div>
-                    <div class="form-group"><label>Password (Leave blank to keep current)</label><input type="password" name="password"></div>
-                    <div class="form-group">
-                        <label>User Type</label>
-                        <select name="user_type">
-                            <option value="0" <?php echo ($user['user_type'] == 0) ? 'selected' : ''; ?>>Normal User</option>
-                            <option value="1" <?php echo ($user['user_type'] == 1) ? 'selected' : ''; ?>>Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>School</label>
-                        <select name="school_id">
-                            <option value="0">All Schools / None</option>
-                            <?php foreach($schools as $s): ?>
-                                <option value="<?php echo $s['id']; ?>" <?php echo (($user['school_id'] ?? 0) == $s['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($s['school_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn">Update User</button>
-                    <a href="add_users.php" class="btn btn-back">Back</a>
-                </form>
-            </div>
-        </div>
+        <a href="add_users.php" class="btn btn-light btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> <?php echo $lang['back']; ?>
+        </a>
     </div>
-</body>
-</html>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span><?php echo htmlspecialchars($error); ?></span>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" action="edit_user.php?id=<?php echo $id; ?>">
+        <div class="form-group">
+            <label for="username"><?php echo $lang['username']; ?> <span style="color: var(--danger);">*</span></label>
+            <input type="text" id="username" name="username" class="form-control" value="<?php echo htmlspecialchars($_POST['username'] ?? $targetUser['username']); ?>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password"><?php echo $lang['password']; ?></label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="ទុកទំនេរ ប្រសិនបើមិនចង់ប្តូរពាក្យសម្ងាត់...">
+        </div>
+
+        <div class="form-group">
+            <label for="user_type"><?php echo $lang['user_role']; ?> <span style="color: var(--danger);">*</span></label>
+            <select id="user_type" name="user_type" class="form-control" required>
+                <option value="0" <?php echo ($targetUser['user_type'] == 0) ? 'selected' : ''; ?>><?php echo $lang['normal_user']; ?></option>
+                <option value="1" <?php echo ($targetUser['user_type'] == 1) ? 'selected' : ''; ?>><?php echo $lang['admin']; ?></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="school_id"><?php echo $lang['school']; ?></label>
+            <select id="school_id" name="school_id" class="form-control">
+                <option value="0"><?php echo $selected_lang === 'kh' ? '-- គ្រប់សាលាទាំងអស់ (Admin) --' : '-- All Schools (Admin) --'; ?></option>
+                <?php foreach ($schools as $s): ?>
+                    <option value="<?php echo $s['id']; ?>" <?php echo ($targetUser['school_id'] == $s['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($s['school_name_kh'] ?: $s['school_name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 24px;">
+                <i class="fa-solid fa-floppy-disk"></i> <?php echo $lang['save']; ?>
+            </button>
+            <a href="add_users.php" class="btn btn-light">
+                <?php echo $lang['cancel']; ?>
+            </a>
+        </div>
+    </form>
+</div>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>

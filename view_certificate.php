@@ -1,139 +1,395 @@
 <?php
-session_start();
-include 'db_connect.php';
+// view_certificate.php - Student Certificate View & Print
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/db_connect.php';
 
-$id = $_GET['id'] ?? '';
-if (empty($id) || !is_numeric($id)) die("Invalid or missing ID");
+$id = intval($_GET['id'] ?? 0);
+if ($id <= 0) {
+    die("<div style='font-family: Arial; text-align: center; padding: 50px;'><h2>Invalid Certificate ID</h2><p><a href='index.php'>Back to Home</a></p></div>");
+}
 
-// Fetch details
-$sql = "SELECT st.ID, st.student_name, st.sex, st.dob, st.photo, c.Course, s.start_date, s.end_date, sch.school_name, sch.school_name_kh, sch.logo 
+// Fetch study, student, course, and school details
+$sql = "SELECT s.id as study_id, st.id as student_id, st.student_name, st.sex, st.dob, st.photo, 
+        c.Course, c.CourseID, c.Note as course_note,
+        s.start_date, s.end_date, 
+        sch.school_name, sch.school_name_kh, sch.logo 
         FROM tb_study s 
-        JOIN tb_students st ON s.id_stu = st.ID 
-        JOIN tb_course c ON s.id_code = c.ID 
-        LEFT JOIN tb_schools sch ON st.school_id = sch.id
-         
+        JOIN tb_students st ON s.id_stu = st.id 
+        JOIN tb_course c ON s.id_code = c.id 
+        LEFT JOIN tb_schools sch ON st.school_id = sch.id 
         WHERE s.id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$result = $stmt->get_result();
-$data = $result->fetch_assoc();
+$data = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
-if (!$data) die("Record not found");
-
-$khmer_months = [
-    '01' => 'មករា', '02' => 'កុម្ភៈ', '03' => 'មីនា', '04' => 'មេសា',
-    '05' => 'ឧសភា', '06' => 'មិថុនា', '07' => 'កក្កដា', '08' => 'សីហា',
-    '09' => 'កញ្ញា', '10' => 'តុលា', '11' => 'វិច្ឆិកា', '12' => 'ធ្នូ'
-];
+if (!$data) {
+    die("<div style='font-family: Arial; text-align: center; padding: 50px;'><h2>Certificate Record Not Found</h2><p><a href='index.php'>Back to Home</a></p></div>");
+}
 
 // Generate QR Code URL
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
-$target_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?id=" . $id;
-$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($target_url);
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$target_url = $protocol . "://" . $host . base_url('view_certificate.php?id=' . $id);
+$qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=" . urlencode($target_url);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="km">
 <head>
-<title>Certificate - <?php echo htmlspecialchars($data['student_name']); ?></title>
-<style>
-    body { font-family: Arial, 'Khmer OS', sans-serif; background: #f0f0f0; text-align: center; padding: 50px; }
-    .certificate { width: 800px; margin: 0 auto; background: white url('logo/border.jpg') no-repeat center center; background-size: 100% 100%; padding: 100px; position: relative; box-shadow: 0 0 20px rgba(6, 3, 215, 0.1); }
-    .header { font-size: 40px; font-weight: bold; color: #150581; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-    .sub-header { font-size: 20px; margin-bottom: 40px; font-style: italic; color: #ff0000; }
-    .name { font-size: 20px;  border-bottom: 2px solid #d80000; display: inline-block; padding: 0 40px; margin: 20px 0; color: #2c3e50; }
-    .body-text { font-size: 20px; margin: 10px 0; color: #010243; font-family: 'Khmer OS';}
-    .course { font-size: 28px; font-weight: bold; margin: 20px 0; color: #e67e22; }
-    .date-range { margin-top: 20px; font-size: 16px; color: #040e7c; }
-    .signature-section { margin-top: 80px; display: flex; justify-content: space-around; padding: 0 20px; }
-    .sig-block { text-align: center; }
-    .border-imger { width: 120px; margin: 5px auto; }
-    .sig-img { width: 120px; }
-    .sig-name { font-size: 16px; margin-top: 5px; }             
-    .sig-title { font-weight: bold; color: #07036c; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>លិខិតបញ្ជាក់ការសិក្សា - <?php echo htmlspecialchars($data['student_name']); ?></title>
     
-    @media print {
-        body { background: white; padding: 0; margin: 0;color: black; }
-        .certificate { background: white url('logo/border.jpg') no-repeat center center !important; background-size: 100% 100% !important; -webkit-print-color-adjust: exact; width: 100%; height: 100vh; box-shadow: none; box-sizing: border-box; margin: 0;text-align: center; }
-        .no-print { display: none; }
-        .header{ font-size: 32px;font-family: 'Khmer OS Muol light';}
-        .name{ font-size: 20px;font-family: 'Khmer OS Muol light';color:red;}
-        .lname{font-family: 'Khmer OS';color: #010243;} 
-        .lsex{font-family: 'Khmer OS';color: #010243;}
-        .ldob{font-family: 'Khmer OS';color: #010243;}
-        .give{ font-size: 24px;font-family: 'Khmer OS Muol light';}
-        .body-text{ font-size: 25px;font-family: 'Khmer OS';}
-    }
-</style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Kantumruy Pro', 'Battambang', Arial, sans-serif;
+            background: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 15px;
+            min-height: 100vh;
+        }
+
+        .no-print-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            z-index: 10;
+        }
+
+        .btn-action {
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        .btn-print { background: #1e3a8a; color: white; }
+        .btn-print:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-back { background: white; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-back:hover { background: #f1f5f9; }
+
+        /* Certificate Container */
+        .cert-wrapper {
+            width: 960px;
+            height: 680px;
+            background: white url('logo/border.jpg') no-repeat center center;
+            background-size: 100% 100%;
+            position: relative;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+            padding: 55px 80px 55px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Top-Left School Logo */
+        .school-logo-box {
+            position: absolute;
+            top: 80px;
+            left: 90px;
+            text-align: center;
+            width: 100px;
+        }
+
+        .school-logo {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .school-title-kh {
+            font-family: 'Moul', serif;
+            font-size: 12px;
+            color: #150581;
+            line-height: 1.3;
+            margin-top: 4px;
+        }
+
+        /* Top-Right Student Photo */
+        .student-photo-box {
+            position: absolute;
+            top: 90px;
+            right: 85px;
+            text-align: center;
+            width: 90px;
+        }
+
+        .student-photo-box img {
+            width: 80px;
+            height: 95px;
+            object-fit: cover;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .cert-id-tag {
+            font-size: 15px;
+            font-weight: bold;
+            color: #060606;
+            margin-top: 4px;
+        }
+
+        /* Titles */
+        .cert-main-title {
+            font-family: 'Moul', serif;
+            font-size: 22px;
+            color: #150581;
+            margin-top: 45px;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+
+        .cert-subtitle {
+            font-family: 'Moul', serif;
+            font-size: 22px;
+            color: #b91c1c;
+            margin: 8px 0 6px;
+        }
+
+        /* Student Information */
+        .student-details {
+            font-size: 20px;
+            color: #070707;
+            margin: 6px 0;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-width: 680px;
+        }
+
+        .name-highlight {
+            font-family: 'Moul', serif;
+            color: #b91c1c;
+            font-size: 16px;
+            padding: 0 3px;
+        }
+
+        .course-highlight {
+            font-family: 'Moul', serif;
+            color: #b91c1c;
+            font-size: 16px;
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .cert-body-text {
+            font-size: 20px;
+            color: #0a0a0a;
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 4px 0;
+        }
+
+        /* Bottom Row: QR & Signature (Safely positioned above golden border) */
+        .signature-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: auto;
+            padding: 0 5px 60px 15px;
+        }
+
+        .qr-section {
+            text-align: center;
+            width: 100px;
+        }
+
+        .qr-section img {
+            width: 68px;
+            height: 68px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            padding: 2px;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .qr-text {
+            font-size: 9px;
+            color: #64748b;
+            margin-top: 3px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .sig-block {
+            text-align: center;
+            width: 220px;
+        }
+
+        .sig-date {
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .sig-role {
+            font-family: 'Moul', serif;
+            font-size: 13px;
+            color: #150581;
+        }
+         .name-sign {
+            font-family: 'Moul', serif;
+            font-size: 13px;
+            color: #e60206;
+            margin-left:75px;
+        }
+
+        .sig-stamp {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Print Optimization */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                height: 100vh !important;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+            .cert-wrapper {
+                box-shadow: none !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                background: white url('logo/border.jpg') no-repeat center center !important;
+                background-size: 100% 100% !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                page-break-inside: avoid !important;
+                padding: 55px 80px 48px 80px !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="certificate">
-       <img src="logo/<?php echo htmlspecialchars($data['logo'] ?? 'meakea.png'); ?>" alt="Logo" style="width: 100px; margin-bottom: 10px;text-align:left;position:absolute;top:120px;left:90px;">
-       <div style="position:absolute; top:200px; left:90px; width:100px; text-align:center; font-family: 'Khmer OS Muol light'; font-size: 12px; color: #150581;"><?php echo htmlspecialchars($data['school_name_kh'] ?? 'មាគ៌ាកុំព្យូទ័រ'); ?></div>
-      
-       <?php if (!empty($data['photo'])): ?>
-           <img src="uploads/<?php echo htmlspecialchars($data['photo']); ?>" alt="Student Photo" style="width: 100px; height: 120px; object-fit: cover; position: absolute; top: 120px; right: 100px; border: 1px solid #ddd;">
-       <?php endif; ?>
-       <div style="position: absolute; top:235px; right: 110px; width: 90px; text-align: center; font-weight: bold; font-size: 14px; color: #000;">លេខ: <?php echo htmlspecialchars(str_pad($data['ID'], 6, '0', STR_PAD_LEFT)); ?></div>
-       <h1 class="header"​ style="font-family: 'Khmer OS Muol light';font-size: 30px;">លិខិតបញ្ជាក់ការសិក្សា</h1>
-       
-        <h2 class="give" style="font-family: 'Khmer OS Muol light';">សូមផ្ដល់ជូន</h2>
-        <div class="name" style="font-family: 'Khmer OS Muol light';">
-            <label class="lname">ឈ្មោះសិស្ស</label><b style="font-family: 'Khmer Muol light';color:red;">
-            <?php echo htmlspecialchars($data['student_name']); ?></b>
-            <label class="lsex">ភេទ</label>
-            <b style="font-family: 'Khmer Muol light';color:red;">
-            <?php echo htmlspecialchars($data['sex'] === 'Male' ? 'ប្រុស' : ($data['sex'] === 'Female' ? 'ស្រី' : $data['sex'])); ?></b>
-            <label class="ldob">ថ្ងៃខែឆ្នំាកំណើត</label>
-            <b style="font-family: 'Khmer Muol light';color:red;">
-            <?php 
-                $dob_ts = strtotime($data['dob']);
-                $khmer_nums = ['0'=>'០', '1'=>'១', '2'=>'២', '3'=>'៣', '4'=>'៤', '5'=>'៥', '6'=>'៦', '7'=>'៧', '8'=>'៨', '9'=>'៩'];
-                $day = strtr(date('d', $dob_ts), $khmer_nums);
-                $year = strtr(date('Y', $dob_ts), $khmer_nums);
-                echo $day . ' ' . $khmer_months[date('m', $dob_ts)] . ' ' . $year; 
-            ?></b>
-    </div>
-        
-        <div class="body-text">
-        បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាល កុំព្យូទ័រ លើផ្នែក<br> <b style="font-family: 'Khmer Muol light';color:red;"><?php echo htmlspecialchars($data['Course'] ?? ''); ?></b>ដោយជោគជ័យ។
-        </div>
-        
-        <div class="study-date" style="font-family: 'Khmer OS'; font-size: 18px; margin-top: 10px;">
-            <?php 
-                $start_ts = strtotime($data['start_date']);
-                $end_ts = strtotime($data['end_date']);
-                $khmer_nums = ['0'=>'០', '1'=>'១', '2'=>'២', '3'=>'៣', '4'=>'៤', '5'=>'៥', '6'=>'៦', '7'=>'៧', '8'=>'៨', '9'=>'៩'];
-                
-                $s_day = strtr(date('d', $start_ts), $khmer_nums);
-                $s_year = strtr(date('Y', $start_ts), $khmer_nums);
-                $e_day = strtr(date('d', $end_ts), $khmer_nums);
-                $e_year = strtr(date('Y', $end_ts), $khmer_nums);
 
-                echo "សិក្សាចាប់ពីថ្ងៃទី " . $s_day . " ខែ " . $khmer_months[date('m', $start_ts)] . " ឆ្នាំ " . $s_year . " ដល់ថ្ងៃទី " . $e_day . " ខែ " . $khmer_months[date('m', $end_ts)] . " ឆ្នាំ " . $e_year; 
-            ?>
+    <!-- Action Bar -->
+    <div class="no-print-bar">
+        <button type="button" class="btn-action btn-print" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> បោះពុម្ព (Print Certificate)
+        </button>
+        <?php if (is_logged_in()): ?>
+            <a href="students/finished.php" class="btn-action btn-back">
+                <i class="fa-solid fa-arrow-left"></i> ត្រឡប់ក្រោយ
+            </a>
+        <?php else: ?>
+            <a href="index.php" class="btn-action btn-back">
+                <i class="fa-solid fa-arrow-left"></i> ទំព័រដើម
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <!-- Certificate Document -->
+    <div class="cert-wrapper">
+        <!-- School Logo & School Name -->
+        <div class="school-logo-box">
+            <img src="logo/<?php echo htmlspecialchars($data['logo'] ?: 'meakea.png'); ?>" alt="Logo" class="school-logo" onerror="this.src='logo/logo.png';">
+            <div class="school-title-kh"><?php echo htmlspecialchars($data['school_name_kh'] ?: 'មាគ៌ាកុំព្យូទ័រ'); ?></div>
         </div>
-        
-        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: space-between; padding: 0 60px; align-items: flex-end;">
-            <div>
-                <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code for verification" style="width:100px; height:100px;">
-                <p style="font-size:10px; color:#555; margin-top:5px; text-align:center;">Scan to Verify</p>
+
+        <!-- Student Photo & ID -->
+        <div class="student-photo-box">
+            <?php if (!empty($data['photo'])): ?>
+                <img src="uploads/<?php echo htmlspecialchars($data['photo']); ?>" alt="Photo" onerror="this.style.display='none';">
+            <?php endif; ?>
+            <div class="cert-id-tag">លេខ: <?php echo htmlspecialchars(str_pad($data['student_id'] ?? $id, 4, '0', STR_PAD_LEFT)); ?></div>
+        </div>
+
+        <!-- Main Titles -->
+        <h1 class="cert-main-title">លិខិតបញ្ជាក់ការសិក្សា
+            <p>♡────୨💻ৎ────♡</p>
+        </h1><br>
+        <h2 class="cert-subtitle">សូមផ្ដល់ជូន</h2>
+
+        <!-- Student Information Details -->
+        <div class="student-details">
+            <span>ឈ្មោះសិស្ស៖</span>
+            <span class="name-highlight"><?php echo htmlspecialchars($data['student_name']); ?></span>
+            <span style="margin-left: 10px;">ភេទ៖</span>
+            <span class="name-highlight"><?php echo khmer_gender($data['sex']); ?></span>
+            <span style="margin-left: 10px;">ថ្ងៃខែឆ្នាំកំណើត៖</span>
+            <span class="name-highlight"><?php echo khmer_date($data['dob']); ?></span>
+        </div>
+
+        <!-- Certificate Body -->
+        <div class="cert-body-text">
+            បានបញ្ចប់វគ្គបណ្ដុះបណ្ដាលកុំព្យូទ័រលើផ្នែក<br>
+            <div class="course-highlight"><?php echo htmlspecialchars($data['Course']); ?></div>
+            ដោយជោគជ័យ បានចូលរៀនចាប់ពីថ្ងៃទី <?php echo khmer_date($data['start_date']); ?> ដល់ថ្ងៃទី <?php echo khmer_date($data['end_date']); ?>។
+        </div>
+
+        <!-- Signatures & Verification Row -->
+        <div class="signature-row">
+            <!-- Left: QR Code Verification -->
+            <div class="qr-section">
+                <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code">
+                <div class="qr-text">Scan to Verify</div>
             </div>
-            <div style="text-align: center;">
-                <div class="date-range" style="font-family: 'Khmer OS'; margin-top: 0; margin-bottom: 10px; font-size: 16px; color: #040e7c;">
-                    <?php 
-                        $end_ts = strtotime($data['end_date']);
-                        $khmer_nums = ['0'=>'០', '1'=>'១', '2'=>'២', '3'=>'៣', '4'=>'៤', '5'=>'៥', '6'=>'៦', '7'=>'៧', '8'=>'៨', '9'=>'៩'];
-                        $day = strtr(date('d', $end_ts), $khmer_nums);
-                        $year = strtr(date('Y', $end_ts), $khmer_nums);
-                        echo "ពួក ថ្ងៃទី " . $day . " ខែ " . $khmer_months[date('m', $end_ts)] . " ឆ្នាំ " . $year; 
-                    ?>
+
+            <!-- Right: Director Signature -->
+            <div class="sig-block">
+                <div class="sig-date">
+                    ធ្វើពួក នៅថ្ងៃទី <?php echo khmer_date($data['end_date']); ?>
                 </div>
-                <div class="sig-title" style="font-family: 'Khmer OS Muol Light';">គណៈគ្រប់គ្រង</div>
-                <img src="logo/meakea.png" alt="Signature" style="width: 120px; margin: 5px auto;">
-                <h2 style="font-family: 'Khmer OS Muol Light'; color: #a50000; margin: 0;">មាគ គា</h2>
+                <div class="sig-role">គណៈគ្រប់គ្រង</div>
+                <div class="sig-stamp">
+                    <!-- Space for Official Stamp / Signature -->
+                     <img src="logo/meakea.png" alt="Stamp" style="height: 40px; object-fit: contain;">
+                     
+                </div>
+                <h3 class="name-sign">មាគ គា</h3>
+
             </div>
         </div>
     </div>
+ 
 </body>
 </html>

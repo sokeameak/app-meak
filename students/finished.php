@@ -1,191 +1,193 @@
 <?php
-session_start();
-include '../db_connect.php';
+// students/finished.php - Finished Students & Certificate Issuance
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../db_connect.php';
+require_login();
 
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
+$user_school_id = get_logged_school_id($conn);
+$isAdmin = is_admin();
+
+$page_title = $lang['finished_students'];
+$page_subtitle = $lang['app_name'];
+
+$search = trim($_GET['search'] ?? '');
+$filter_school = $_GET['filter_school'] ?? '';
+
+// Build Where
+$whereConditions = ["s.end_date <= CURDATE()"];
+if (!$isAdmin && $user_school_id > 0) {
+    $whereConditions[] = "st.school_id = " . intval($user_school_id);
+} elseif (!empty($filter_school)) {
+    $whereConditions[] = "st.school_id = " . intval($filter_school);
 }
 
-// Get current user's school_id
-$user_school_id = 0;
-$stmt = $conn->prepare("SELECT school_id FROM tb_users WHERE username = ?");
-$stmt->bind_param("s", $_SESSION['user']);
-$stmt->execute();
-$resUser = $stmt->get_result();
-if ($rowUser = $resUser->fetch_assoc()) {
-    $user_school_id = $rowUser['school_id'];
-}
-$stmt->close();
-
-$whereSQL = " WHERE s.end_date <= CURDATE()";
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
-    $whereSQL .= " AND st.school_id = " . $user_school_id;
+if (!empty($search)) {
+    $whereConditions[] = "st.student_name LIKE '%" . $conn->real_escape_string($search) . "%'";
 }
 
-// Fetch finished students (where end_date is in the past)
-$sql = "SELECT s.id as study_id, st.ID, st.student_name, st.sex, st.dob, st.photo, s.end_date, c.Course, sch.school_name 
+$whereSQL = " WHERE " . implode(" AND ", $whereConditions);
+
+// Fetch schools (admin)
+$schools = [];
+if ($isAdmin) {
+    $sRes = $conn->query("SELECT id, school_name, school_name_kh FROM tb_schools ORDER BY school_name");
+    if ($sRes) {
+        while ($row = $sRes->fetch_assoc()) $schools[] = $row;
+    }
+}
+
+// Fetch Finished Students
+$sql = "SELECT s.id as study_id, st.id as student_id, st.student_name, st.sex, st.dob, st.photo, 
+        s.start_date, s.end_date, c.Course, c.CourseID,
+        sch.school_name, sch.school_name_kh,
+        (SELECT COUNT(*) FROM tbl_certi WHERE study_id = s.id) as has_cert
         FROM tb_study s 
-        JOIN tb_students st ON s.id_stu = st.ID 
-        JOIN tb_course c ON s.id_code = c.ID 
+        JOIN tb_students st ON s.id_stu = st.id 
+        JOIN tb_course c ON s.id_code = c.id 
         LEFT JOIN tb_schools sch ON st.school_id = sch.id
         $whereSQL
         ORDER BY s.end_date DESC";
 $result = $conn->query($sql);
+
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finished Students</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, 'Khmer OS', sans-serif; background: #f4f4f4; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
-        .sidebar h3 { margin-bottom: 20px; }
-        .sidebar a { display: block; padding: 10px; margin: 5px 0; text-decoration: none; color: white; border-radius: 5px; }
-        .sidebar a:hover { background: #34495e; }
-        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; }
-        .main-content { flex: 1; padding: 20px; }
-        .header { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .card { background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #2c3e50; color: white; font-weight: bold; }
-        tr:hover { background: #f9f9f9; }
-        .student-id { font-weight: bold; background: #ecf0f1; width: 60px; }
-        .btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #2980b9; }
-        .btn-add { background: #16a085; padding: 10px 20px; }
-        .btn-add:hover { background: #138d75; }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #34495e;">
-                <div style="width: 80px; height: 80px; background: #ecf0f1; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #2c3e50; font-weight: bold;">
-                    <?php echo strtoupper(substr($_SESSION['user'], 0, 1)); ?>
-                </div>
-                <div style="color: white; font-weight: bold; font-size: 1.1em;"><?php echo htmlspecialchars($_SESSION['user']); ?></div>
-                <div style="color: #bdc3c7; font-size: 0.8em; margin-top: 5px;"><?php echo (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) ? 'Administrator' : 'Normal User'; ?></div>
-            </div>
-            <h3>Dashboard</h3>
-            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> Home</a>
-            <a href="list_student.php"><i class="fa-solid fa-user-graduate"></i> Students</a>
-            <a href="register_student.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
-            <!-- <a href="register_student_study.php"><i class="fa-solid fa-registered"></i> Register & Study</a> -->
-            <a href="../study/list_study.php"><i class="fa-solid fa-book-open"></i> Study</a>
-            <a href="../courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> Course</a>
-            <a href="../time/grades.php"><i class="fa-solid fa-clock"></i> Grades</a>
-            <a href="../invoice/invoice.php"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</a>
-            <a href="finished_student.php" style="background: #34495e;"><i class="fa-solid fa-user-check"></i> Finished Students</a>
-            <a href="../invoice/paid.php"><i class="fa-solid fa-file-invoice"></i> Paid List</a>
-            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
-            <a href="../users/add_users.php"><i class="fa-solid fa-users-cog"></i> Users</a>
-            <?php endif; ?>
-            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
-        </div>
-
-        <div class="main-content">
-            <div class="header">
-                <div>
-                    <h1>Finished Students</h1>
-                    <p>List of students who have completed their courses.</p>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="search_name" onkeyup="filterFinishedStudents()" placeholder="Search Name..." style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                    <a href="add_finished_student.php" class="btn btn-add">+ Add Finished Student</a>
-                </div>
-            </div>
-
-            <div class="card">
-            <form method="POST" action="insert_certi.php">
-                <table width="100%">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                            <th>ID</th>
-                            <th>Photo</th>
-                            <th>Student Name</th>
-                            <th>Sex</th>
-                            <th>Course</th>
-                            <th>School</th>
-                            <th>Finished Date</th>
-                            <th style="width: 150px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if ($result && $result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                echo "<td><input type='checkbox' name='ids[]' value='" . $row['study_id'] . "'></td>";
-                                echo "<td class='student-id'>" . htmlspecialchars($row['ID']) . "</td>";
-                                echo "<td>";
-                                if (!empty($row['photo'])) {
-                                    echo "<img src='../uploads/" . htmlspecialchars($row['photo']) . "' width='50' height='50' style='object-fit: cover; border-radius: 50%;'>";
-                                } else {
-                                    echo "<span style='color: #ccc;'>No Photo</span>";
-                                }
-                                echo "</td>";
-                                echo "<td>" . htmlspecialchars($row['student_name']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['sex']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['end_date']) . "</td>";
-                                echo "<td>";
-                                echo "<a href='get_certificate.php?id=" . $row['study_id'] . "' target='_blank' class='btn' style='background: #8e44ad; margin-right: 5px;' title='Certificate'><i class='fa-solid fa-certificate'></i></a>";
-                                if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) {
-                                echo "<a href='delete_finished.php?id=" . $row['study_id'] . "' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to remove this record?\")' title='Remove'><i class='fa-solid fa-trash'></i></a>";
-                                }
-                                echo "</td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='7' style='text-align: center; padding: 20px; color: #999;'>No finished students found</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-                <button type="submit" class="btn" style="margin-top: 10px;">
-                    Insert into tbl_certi
-                </button>
-            </div>
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="fa-solid fa-award" style="color: var(--warning);"></i>
+            <span><?php echo $lang['finished_students']; ?></span>
         </div>
     </div>
-    <script>
-        function toggleAll(source) {
-            checkboxes = document.getElementsByName('ids[]');
-            for(var i=0, n=checkboxes.length;i<n;i++) {
-                checkboxes[i].checked = source.checked;
-            }
-        }
 
-        function filterFinishedStudents() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("search_name");
-            filter = input.value.toUpperCase();
-            table = document.querySelector("table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[3]; // Column 3 is Student Name
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-       
-    </script>
-</body>
-</html>
+    <!-- Filter Bar -->
+    <form method="GET" action="finished.php" style="background: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="<?php echo $lang['search']; ?>..." class="form-control" style="width: 220px; font-size: 13px;">
+
+        <?php if ($isAdmin): ?>
+            <select name="filter_school" class="form-control" style="width: 180px; font-size: 13px;">
+                <option value=""><?php echo $lang['all_schools']; ?></option>
+                <?php foreach ($schools as $s): ?>
+                    <option value="<?php echo $s['id']; ?>" <?php echo ($filter_school == $s['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($s['school_name_kh'] ?: $s['school_name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+
+        <button type="submit" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-filter"></i> <?php echo $lang['filter']; ?>
+        </button>
+
+        <?php if (!empty($search) || !empty($filter_school)): ?>
+            <a href="finished.php" class="btn btn-light btn-sm">
+                <i class="fa-solid fa-xmark"></i> <?php echo $selected_lang === 'kh' ? 'សម្អាត' : 'Clear'; ?>
+            </a>
+        <?php endif; ?>
+    </form>
+
+    <!-- Batch Form for Issue Certificates -->
+    <form method="POST" action="insert_certi.php">
+        <div style="margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-certificate"></i> <?php echo $lang['issue_cert']; ?> (ជ្រើសរើស)
+            </button>
+            <span style="font-size: 13px; color: var(--text-muted);">
+                សរុបសិស្សបញ្ចប់៖ <strong><?php echo $result ? $result->num_rows : 0; ?> នាក់</strong>
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;">
+                            <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes(this)">
+                        </th>
+                        <th style="width: 50px;">Photo</th>
+                        <th><?php echo $lang['student_name']; ?></th>
+                        <th><?php echo $lang['sex']; ?></th>
+                        <th><?php echo $lang['dob']; ?></th>
+                        <th><?php echo $lang['course_name']; ?></th>
+                        <th><?php echo $lang['school']; ?></th>
+                        <th><?php echo $lang['end_date']; ?></th>
+                        <th><?php echo $lang['status']; ?></th>
+                        <th style="width: 160px; text-align: center;"><?php echo $lang['actions']; ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($result && $result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" name="ids[]" value="<?php echo $row['study_id']; ?>" class="row-checkbox">
+                                </td>
+                                <td>
+                                    <?php if (!empty($row['photo'])): ?>
+                                        <img src="../uploads/<?php echo htmlspecialchars($row['photo']); ?>" alt="Photo" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;" onerror="this.outerHTML='<div style=\'width:40px;height:40px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;\'><i class=\'fa-solid fa-user\'></i></div>';">
+                                    <?php else: ?>
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 14px;">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <strong><?php echo htmlspecialchars($row['student_name']); ?></strong>
+                                </td>
+                                <td><?php echo khmer_gender($row['sex']); ?></td>
+                                <td><?php echo khmer_date($row['dob']); ?></td>
+                                <td>
+                                    <span class="badge badge-info"><?php echo htmlspecialchars($row['Course']); ?></span>
+                                </td>
+                                <td>
+                                    <span style="font-size: 13px; color: var(--text-muted);">
+                                        <?php echo htmlspecialchars($row['school_name_kh'] ?: ($row['school_name'] ?: 'N/A')); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo khmer_date($row['end_date']); ?></td>
+                                <td>
+                                    <?php if ($row['has_cert'] > 0): ?>
+                                        <span class="badge badge-success"><i class="fa-solid fa-check"></i> <?php echo $selected_lang === 'kh' ? 'មានវិញ្ញាបនបត្រ' : 'Certified'; ?></span>
+                                    <?php else: ?>
+                                        <span class="badge badge-warning"><?php echo $selected_lang === 'kh' ? 'មិនទាន់ចេញ' : 'Pending Cert'; ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div style="display: inline-flex; gap: 4px;">
+                                        <a href="../view_certificate.php?id=<?php echo $row['study_id']; ?>" target="_blank" class="btn btn-sm btn-primary" title="<?php echo $lang['view_cert']; ?>">
+                                            <i class="fa-solid fa-print"></i>
+                                        </a>
+                                        <a href="delete_finished.php?id=<?php echo $row['study_id']; ?>" class="btn btn-sm btn-danger" onclick="return confirmDelete('<?php echo addslashes($lang['confirm_delete']); ?>')" title="<?php echo $lang['delete']; ?>">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                <i class="fa-solid fa-graduation-cap" style="font-size: 32px; color: #cbd5e1; margin-bottom: 8px; display: block;"></i>
+                                <?php echo $lang['no_records']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleAllCheckboxes(source) {
+    var checkboxes = document.querySelectorAll('.row-checkbox');
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -1,244 +1,259 @@
 <?php
-session_start();
-include '../db_connect.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
+// study/list_study.php - Manage Student Study Enrollments
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+require_once __DIR__ . '/../db_connect.php';
+require_login();
 
-// Get current user's school_id
-$user_school_id = 0;
-$stmt = $conn->prepare("SELECT school_id FROM tb_users WHERE username = ?");
-$stmt->bind_param("s", $_SESSION['user']);
-$stmt->execute();
-$resUser = $stmt->get_result();
-if ($rowUser = $resUser->fetch_assoc()) {
-    $user_school_id = $rowUser['school_id'];
-}
-$stmt->close();
+$user_school_id = get_logged_school_id($conn);
+$isAdmin = is_admin();
 
-$message = '';
-$error = '';
-if (isset($_GET['message'])) $message = $_GET['message'];
+$page_title = $lang['study'];
+$page_subtitle = $lang['app_name'] . ' - ' . $lang['study'];
 
 $search_date = $_GET['search_date'] ?? '';
+$search_name = trim($_GET['search_name'] ?? '');
+$filter_course = $_GET['filter_course'] ?? '';
+$filter_time = $_GET['filter_time'] ?? '';
+$filter_school = $_GET['filter_school'] ?? '';
 $show_all = isset($_GET['show_all']);
 
-// Fetch distinct start dates for filter
+// Fetch Distinct Start Dates
 $dates = [];
-$sql_dates = "SELECT DISTINCT start_date FROM tb_study ORDER BY start_date DESC";
-$result_dates = $conn->query($sql_dates);
-if ($result_dates) {
-    while ($row = $result_dates->fetch_assoc()) $dates[] = $row['start_date'];
+$dateRes = $conn->query("SELECT DISTINCT start_date FROM tb_study ORDER BY start_date DESC LIMIT 50");
+if ($dateRes) {
+    while ($row = $dateRes->fetch_assoc()) $dates[] = $row['start_date'];
 }
 
-// Fetch all study records from database with JOIN to get names
-$studies = [];
-$sql = "SELECT 
-    s.id,
-    s.id_stu,
-    s.id_time,
-    s.id_code,
-    s.price,
-    s.start_date,
-    s.end_date,
-    st.student_name,
-    t.time,
-    c.Course,
-    sch.school_name
-FROM tb_study s
-LEFT JOIN tb_students st ON s.id_stu = st.ID
-LEFT JOIN tb_time t ON s.id_time = t.id
-LEFT JOIN tb_course c ON s.id_code = c.ID
-LEFT JOIN tb_schools sch ON st.school_id = sch.id
-";
-
-$whereClauses = [];
-if (!empty($search_date)) {
-    $whereClauses[] = "s.start_date = '" . $conn->real_escape_string($search_date) . "'";
-} elseif ($show_all) {
-    // Show all records
-} else {
-    $whereClauses[] = "s.end_date > CURDATE()";
+// Fetch Courses
+$courses = [];
+$cRes = $conn->query("SELECT ID, Course FROM tb_course ORDER BY Course ASC");
+if ($cRes) {
+    while ($row = $cRes->fetch_assoc()) $courses[] = $row;
 }
 
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 1 && $user_school_id > 0) {
-    $whereClauses[] = "st.school_id = " . $user_school_id;
+// Fetch Time Slots
+$times = [];
+$tRes = $conn->query("SELECT id, time FROM tb_time ORDER BY id ASC");
+if ($tRes) {
+    while ($row = $tRes->fetch_assoc()) $times[] = $row;
 }
 
-if (!empty($whereClauses)) {
-    $sql .= " WHERE " . implode(" AND ", $whereClauses);
-}
-
-$sql .= " GROUP BY s.id ORDER BY s.id DESC";
-$result = $conn->query($sql);
-
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $studies[] = $row;
+// Fetch Schools
+$schools = [];
+if ($isAdmin) {
+    $sRes = $conn->query("SELECT id, school_name, school_name_kh FROM tb_schools ORDER BY school_name");
+    if ($sRes) {
+        while ($row = $sRes->fetch_assoc()) $schools[] = $row;
     }
 }
+
+// Build Filter Conditions
+$whereClauses = [];
+
+if (!empty($search_date)) {
+    $whereClauses[] = "s.start_date = '" . $conn->real_escape_string($search_date) . "'";
+} elseif (!$show_all) {
+    $whereClauses[] = "s.end_date > CURDATE()"; // Active by default
+}
+
+if (!empty($search_name)) {
+    $whereClauses[] = "st.student_name LIKE '%" . $conn->real_escape_string($search_name) . "%'";
+}
+
+if (!empty($filter_course)) {
+    $whereClauses[] = "s.id_code = " . intval($filter_course);
+}
+
+if (!empty($filter_time)) {
+    $whereClauses[] = "s.id_time = " . intval($filter_time);
+}
+
+if (!$isAdmin && $user_school_id > 0) {
+    $whereClauses[] = "st.school_id = " . intval($user_school_id);
+} elseif (!empty($filter_school)) {
+    $whereClauses[] = "st.school_id = " . intval($filter_school);
+}
+
+$whereSQL = !empty($whereClauses) ? " WHERE " . implode(" AND ", $whereClauses) : "";
+
+$sql = "SELECT s.*, 
+        st.student_name, st.sex, st.dob, st.photo,
+        t.time, c.Course, c.CourseID,
+        sch.school_name, sch.school_name_kh,
+        CASE WHEN s.end_date > CURDATE() THEN 'active' ELSE 'finished' END as study_status
+        FROM tb_study s
+        JOIN tb_students st ON s.id_stu = st.ID
+        JOIN tb_time t ON s.id_time = t.id
+        JOIN tb_course c ON s.id_code = c.ID
+        LEFT JOIN tb_schools sch ON st.school_id = sch.id
+        $whereSQL
+        ORDER BY s.id DESC";
+$result = $conn->query($sql);
+
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Records</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, 'Khmer OS', sans-serif; background: #f4f4f4; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
-        .sidebar h3 { margin-bottom: 20px; }
-        .sidebar a { display: block; padding: 10px; margin: 5px 0; text-decoration: none; color: white; border-radius: 5px; }
-        .sidebar a:hover { background: #34495e; }
-        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; }
-        .main-content { flex: 1; padding: 20px; }
-        .header { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { flex: 1; }
-        .card { background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #2c3e50; color: white; font-weight: bold; }
-        tr:hover { background: #f9f9f9; }
-        .study-id { font-weight: bold; background: #ecf0f1; width: 60px; }
-        .btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #2980b9; }
-        .btn-edit { background: #27ae60; }
-        .btn-edit:hover { background: #229954; }
-        .btn-delete { background: #e74c3c; }
-        .btn-delete:hover { background: #c0392b; }
-        .btn-add { background: #16a085; padding: 10px 20px; }
-        .btn-add:hover { background: #138d75; }
-        .btn-finish { background: #8e44ad; }
-        .btn-finish:hover { background: #732d91; }
-        .message { background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb; }
-        .error-msg { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #34495e;">
-                <div style="width: 80px; height: 80px; background: #ecf0f1; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #2c3e50; font-weight: bold;">
-                    <?php echo strtoupper(substr($_SESSION['user'], 0, 1)); ?>
-                </div>
-                <div style="color: white; font-weight: bold; font-size: 1.1em;"><?php echo htmlspecialchars($_SESSION['user']); ?></div>
-                <div style="color: #bdc3c7; font-size: 0.8em; margin-top: 5px;"><?php echo (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1) ? $lang['admin'] : $lang['normal_user']; ?></div>
-                <div style="margin-top: 10px;">
-                    <a href="<?php echo getUrlWithLang('en'); ?>" style="display:inline; padding:5px; color:white; <?php echo $selected_lang=='en'?'font-weight:bold; text-decoration:underline;':''; ?>">EN</a> | 
-                    <a href="<?php echo getUrlWithLang('kh'); ?>" style="display:inline; padding:5px; color:white; <?php echo $selected_lang=='kh'?'font-weight:bold; text-decoration:underline;':''; ?>">KH</a>
-                </div>
-            </div>
-            <h3><?php echo $lang['dashboard']; ?></h3>
-            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> <?php echo $lang['home']; ?></a>
-            <a href="../students/list_student.php"><i class="fa-solid fa-user-graduate"></i> <?php echo $lang['students']; ?></a>
-            <a href="../students/register_student.php"><i class="fa-solid fa-user-plus"></i> <?php echo $lang['add_student']; ?></a>
-            <!-- <a href="../students/register_student_study.php"><i class="fa-solid fa-registered"></i> <?php echo $lang['register_study']; ?></a> -->
-            <a href="list_study.php" style="background: #34495e;"><i class="fa-solid fa-book-open"></i> <?php echo $lang['study']; ?></a>
-            <a href="../courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> <?php echo $lang['course']; ?></a>
-            <a href="../time/grades.php"><i class="fa-solid fa-clock"></i> <?php echo $lang['grades']; ?></a>
-            <a href="../invoice/invoice.php"><i class="fa-solid fa-file-invoice-dollar"></i> <?php echo $lang['invoices']; ?></a>
-            <a href="../students/finished_student.php"><i class="fa-solid fa-user-check"></i> <?php echo $lang['finished_students']; ?></a>
-            <a href="../invoice/paid.php"><i class="fa-solid fa-file-invoice"></i> <?php echo $lang['paid_list']; ?></a>
-            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
-            <a href="../users/add_users.php"><i class="fa-solid fa-users-cog"></i> <?php echo $lang['users']; ?></a>
-            <?php endif; ?>
-            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> <?php echo $lang['logout']; ?></a>
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="fa-solid fa-book-open-reader" style="color: var(--secondary);"></i>
+            <span><?php echo $lang['study']; ?></span>
         </div>
-
-        <div class="main-content">
-            <div class="header">
-                <div>
-                    <h1>Study Records</h1>
-                    <p>Manage all study sessions and records</p>
-                </div>
-                <div>
-                    <form method="GET" style="display: inline-block; margin-right: 10px;">
-                        <label style="margin-right: 5px; font-weight: bold; color: #2c3e50; cursor: pointer;">
-                            <input type="checkbox" name="show_all" <?php echo $show_all ? 'checked' : ''; ?>> Show All
-                        </label>
-                        <select name="search_date" style="padding: 7px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="">-- Select Date --</option>
-                            <?php foreach ($dates as $date): ?>
-                                <option value="<?php echo $date; ?>" <?php echo ($search_date == $date) ? 'selected' : ''; ?>><?php echo $date; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn" style="background: #2c3e50;">Filter</button>
-                        <?php if (!empty($search_date)): ?>
-                            <a href="list_study.php" class="btn" style="background: #7f8c8d; text-decoration:none;">Reset</a>
-                        <?php endif; ?>
-                    </form>
-                    <a href="../students/finished_student.php" class="btn" style="background: #f39c12;">Finished Students</a>
-                    <a href="add_study.php" class="btn btn-add">+ Add Study</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <?php if (!empty($message)): ?>
-                    <div class="message">
-                        <?php echo htmlspecialchars($message); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($error)): ?>
-                    <div class="error-msg">
-                        <?php echo htmlspecialchars($error); ?>
-                    </div>
-                <?php endif; ?>
-
-                <table width="100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Student</th>
-                            <th>School</th>
-                            <th>Time Slot</th>
-                            <th>Course</th>
-                            <th>Price</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th style="width: 180px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($studies)): ?>
-                            <tr>
-                                <td colspan="8" style="text-align: center; padding: 20px; color: #999;">No study records added yet.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($studies as $study): ?>
-                                <tr>
-                                    <td class="study-id"><?php echo htmlspecialchars($study['id'] ?? ''); ?></td>
-                                    <td>
-                                        <?php echo htmlspecialchars($study['student_name'] ?? ''); ?>
-                                        <a href="finish_study.php?id=<?php echo $study['id']; ?>" class="btn btn-finish" onclick="return confirm('Are you sure you want to finish this study?')" title="Finish" style="float: right; padding: 4px 8px; font-size: 12px;"><i class="fa-solid fa-check"></i></a>
-                                    </td>
-                                    <td><span style='font-size:0.9em; color:#555;'><?php echo htmlspecialchars($study['school_name'] ?? 'Default'); ?></span></td>
-                                    <td><?php echo htmlspecialchars($study['time'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($study['Course'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($study['price'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($study['start_date'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($study['end_date'] ?? ''); ?></td>
-                                    <td>
-                                        <a href="edit_study.php?id=<?php echo $study['id']; ?>" class="btn btn-edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
-                                        <a href="delete_study.php?id=<?php echo $study['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure?')" title="Delete"><i class="fa-solid fa-trash"></i></a>
-                                        <?php endif; ?>
-                                        
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <a href="add_study.php" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus"></i> <?php echo $selected_lang === 'kh' ? 'បន្ថែមការសិក្សាថ្មី' : 'Add Enrollment'; ?>
+        </a>
     </div>
-</body>
-</html>
+
+    <!-- Filter Bar -->
+    <form method="GET" action="list_study.php" style="background: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <input type="text" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>" placeholder="<?php echo $lang['student_name']; ?>..." class="form-control" style="width: 180px; font-size: 13px;">
+
+        <select name="search_date" class="form-control" style="width: 150px; font-size: 13px;">
+            <option value=""><?php echo $selected_lang === 'kh' ? '-- ថ្ងៃចូលរៀន --' : '-- Start Date --'; ?></option>
+            <?php foreach ($dates as $d): ?>
+                <option value="<?php echo $d; ?>" <?php echo ($search_date == $d) ? 'selected' : ''; ?>>
+                    <?php echo khmer_date($d); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <select name="filter_course" class="form-control" style="width: 150px; font-size: 13px;">
+            <option value=""><?php echo $lang['all_courses']; ?></option>
+            <?php foreach ($courses as $c): ?>
+                <option value="<?php echo $c['ID']; ?>" <?php echo ($filter_course == $c['ID']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($c['Course']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <select name="filter_time" class="form-control" style="width: 150px; font-size: 13px;">
+            <option value=""><?php echo $lang['all_times']; ?></option>
+            <?php foreach ($times as $t): ?>
+                <option value="<?php echo $t['id']; ?>" <?php echo ($filter_time == $t['id']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($t['time']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <?php if ($isAdmin): ?>
+            <select name="filter_school" class="form-control" style="width: 150px; font-size: 13px;">
+                <option value=""><?php echo $lang['all_schools']; ?></option>
+                <?php foreach ($schools as $s): ?>
+                    <option value="<?php echo $s['id']; ?>" <?php echo ($filter_school == $s['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($s['school_name_kh'] ?: $s['school_name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+
+        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+            <input type="checkbox" name="show_all" <?php echo $show_all ? 'checked' : ''; ?>>
+            <span><?php echo $selected_lang === 'kh' ? 'បង្ហាញទាំងអស់' : 'Show All'; ?></span>
+        </label>
+
+        <button type="submit" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-filter"></i> <?php echo $lang['filter']; ?>
+        </button>
+
+        <a href="list_study.php" class="btn btn-light btn-sm">
+            <i class="fa-solid fa-xmark"></i> <?php echo $selected_lang === 'kh' ? 'សម្អាត' : 'Clear'; ?>
+        </a>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th style="width: 50px;">Photo</th>
+                    <th><?php echo $lang['student_name']; ?></th>
+                    <th><?php echo $lang['course_name']; ?></th>
+                    <th><?php echo $lang['time_slot']; ?></th>
+                    <th><?php echo $lang['price']; ?></th>
+                    <th><?php echo $lang['start_date']; ?></th>
+                    <th><?php echo $lang['end_date']; ?></th>
+                    <th><?php echo $lang['status']; ?></th>
+                    <th style="width: 160px; text-align: center;"><?php echo $lang['actions']; ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><strong style="color: var(--text-muted);">#<?php echo $row['id']; ?></strong></td>
+                            <td>
+                                <?php if (!empty($row['photo'])): ?>
+                                    <img src="../uploads/<?php echo htmlspecialchars($row['photo']); ?>" alt="Photo" style="width: 38px; height: 38px; object-fit: cover; border-radius: 50%;" onerror="this.outerHTML='<div style=\'width:38px;height:38px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:12px;\'><i class=\'fa-solid fa-user\'></i></div>';">
+                                <?php else: ?>
+                                    <div style="width: 38px; height: 38px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 12px;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <a href="<?php echo base_url('invoice/invoice.php?student_id=' . $row['id_stu']); ?>" onclick="openPaymentModal(<?php echo $row['id_stu']; ?>); return false;" class="student-pay-link" title="ចុចដើម្បីបង្កើតវិក្កយបត្រ / បង់ប្រាក់">
+                                    <?php echo htmlspecialchars($row['student_name']); ?>
+                                    <i class="fa-solid fa-file-invoice-dollar" style="font-size: 12px; color: var(--success);" title="បង្កើតវិក្កយបត្រ / បង់ប្រាក់"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge badge-info"><?php echo htmlspecialchars($row['Course']); ?></span>
+                            </td>
+                            <td><?php echo htmlspecialchars($row['time']); ?></td>
+                            <td style="font-weight: 700; color: #b45309;"><?php echo format_money($row['price']); ?></td>
+                            <td><?php echo khmer_date($row['start_date']); ?></td>
+                            <td><?php echo khmer_date($row['end_date']); ?></td>
+                            <td>
+                                <?php if ($row['study_status'] === 'active'): ?>
+                                    <span class="badge badge-success"><?php echo $lang['studying']; ?></span>
+                                <?php else: ?>
+                                    <span class="badge badge-warning"><?php echo $lang['finished']; ?></span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: inline-flex; gap: 4px;">
+                                    <button type="button" class="btn btn-sm btn-success" onclick="openPaymentModal(<?php echo $row['id_stu']; ?>)" title="បង់ប្រាក់រហ័ស">
+                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                    </button>
+                                    <a href="<?php echo base_url('invoice/invoice.php?student_id=' . $row['id_stu']); ?>" class="btn btn-sm btn-primary" title="បង្កើតវិក្កយបត្រ (Create Invoice)">
+                                        <i class="fa-solid fa-file-invoice"></i>
+                                    </a>
+                                    <?php if ($row['study_status'] === 'active'): ?>
+                                        <a href="finish_study.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-light" title="<?php echo $selected_lang === 'kh' ? 'បញ្ចប់ការសិក្សា' : 'Mark Finished'; ?>" onclick="return confirm('តើអ្នកពិតជាចង់បញ្ចប់ការសិក្សាសម្រាប់សិស្សនេះមែនទេ?')">
+                                            <i class="fa-solid fa-check"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="../view_certificate.php?id=<?php echo $row['id']; ?>" target="_blank" class="btn btn-sm btn-primary" title="<?php echo $lang['view_cert']; ?>">
+                                            <i class="fa-solid fa-print"></i>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <a href="edit_study.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-warning" title="<?php echo $lang['edit']; ?>">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a href="delete_study.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirmDelete('<?php echo addslashes($lang['confirm_delete']); ?>')" title="<?php echo $lang['delete']; ?>">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fa-solid fa-folder-open" style="font-size: 32px; color: #cbd5e1; margin-bottom: 8px; display: block;"></i>
+                            <?php echo $lang['no_records']; ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php include __DIR__ . '/../includes/payment_modal.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

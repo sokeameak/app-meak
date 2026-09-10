@@ -1,0 +1,1287 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.3
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost:3306
+-- Generation Time: Aug 26, 2026 at 01:00 PM
+-- Server version: 11.4.12-MariaDB-cll-lve
+-- PHP Version: 8.4.24
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `meakncva_lara808`
+--
+CREATE DATABASE IF NOT EXISTS `meakncva_lara808` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `meakncva_lara808`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache`
+--
+
+CREATE TABLE `cache` (
+  `key` varchar(255) NOT NULL,
+  `value` mediumtext NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache_locks`
+--
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobs`
+--
+
+CREATE TABLE `jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_batches`
+--
+
+CREATE TABLE `job_batches` (
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `total_jobs` int(11) NOT NULL,
+  `pending_jobs` int(11) NOT NULL,
+  `failed_jobs` int(11) NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `finished_at` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(1, '0001_01_01_000000_create_users_table', 1),
+(2, '0001_01_01_000001_create_cache_table', 1),
+(3, '0001_01_01_000002_create_jobs_table', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` varchar(255) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('UG1ybfnyv3MK430L3aMzh48qmKPEKvv27b9uzgzk', NULL, '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRURFNGNIeG8wR2U3c3h6bzRJek45dmpRYmo1VTBQYzNGbmZMbDJ2RSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHBzOi8vbWVha2tlYS5jb20vbWtfbGFyYXZlbC9wdWJsaWMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1780998478);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `cache`
+--
+ALTER TABLE `cache`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `cache_locks`
+--
+ALTER TABLE `cache_locks`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `jobs`
+--
+ALTER TABLE `jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `jobs_queue_index` (`queue`);
+
+--
+-- Indexes for table `job_batches`
+--
+ALTER TABLE `job_batches`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sessions_user_id_index` (`user_id`),
+  ADD KEY `sessions_last_activity_index` (`last_activity`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobs`
+--
+ALTER TABLE `jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- Database: `meakncva_mk`
+--
+CREATE DATABASE IF NOT EXISTS `meakncva_mk` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `meakncva_mk`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_certi`
+--
+
+CREATE TABLE `tbl_certi` (
+  `id` int(11) NOT NULL,
+  `id_student` int(11) NOT NULL,
+  `id_study` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `study_id` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=MyISAM DEFAULT CHARSET=utf16 COLLATE=utf16_unicode_ci;
+
+--
+-- Dumping data for table `tbl_certi`
+--
+
+INSERT INTO `tbl_certi` (`id`, `id_student`, `id_study`, `status`, `study_id`, `created_at`) VALUES
+(1, 0, 0, 0, 43, '2026-03-22 09:33:20'),
+(2, 0, 0, 0, 44, '2026-03-22 09:33:20'),
+(3, 0, 0, 0, 45, '2026-03-22 09:33:20'),
+(4, 0, 0, 0, 46, '2026-03-22 09:33:20'),
+(5, 0, 0, 0, 50, '2026-03-22 09:33:20'),
+(6, 0, 0, 0, 51, '2026-03-22 09:33:20'),
+(7, 0, 0, 0, 52, '2026-03-22 09:33:20'),
+(8, 0, 0, 0, 53, '2026-03-22 09:33:20'),
+(9, 0, 0, 0, 54, '2026-03-22 09:33:20'),
+(10, 0, 0, 0, 55, '2026-03-22 09:33:20'),
+(11, 0, 0, 0, 56, '2026-03-22 09:33:20'),
+(12, 0, 0, 0, 57, '2026-03-22 09:33:20'),
+(13, 0, 0, 0, 58, '2026-03-22 09:33:20'),
+(14, 0, 0, 0, 59, '2026-03-22 09:33:20'),
+(15, 0, 0, 0, 60, '2026-03-22 09:33:20'),
+(16, 0, 0, 0, 61, '2026-03-22 09:33:20'),
+(17, 0, 0, 0, 62, '2026-03-22 09:33:20'),
+(18, 0, 0, 0, 63, '2026-03-22 09:33:20'),
+(19, 0, 0, 0, 64, '2026-03-22 09:33:20'),
+(20, 0, 0, 0, 65, '2026-03-22 09:33:20'),
+(21, 0, 0, 0, 66, '2026-03-22 09:33:20'),
+(22, 0, 0, 0, 67, '2026-03-22 09:33:20'),
+(23, 0, 0, 0, 68, '2026-03-22 09:33:20'),
+(24, 0, 0, 0, 69, '2026-03-22 09:33:20'),
+(25, 0, 0, 0, 70, '2026-03-22 09:33:20'),
+(26, 0, 0, 0, 71, '2026-03-22 09:33:20'),
+(27, 0, 0, 0, 75, '2026-03-22 09:33:20'),
+(28, 0, 0, 0, 76, '2026-03-22 09:33:20'),
+(29, 0, 0, 0, 43, '2026-03-22 10:35:08'),
+(30, 0, 0, 0, 44, '2026-03-22 10:35:08'),
+(31, 0, 0, 0, 45, '2026-03-22 10:35:08'),
+(32, 0, 0, 0, 46, '2026-03-22 10:35:08'),
+(33, 0, 0, 0, 50, '2026-03-22 10:35:08'),
+(34, 0, 0, 0, 51, '2026-03-22 10:35:08'),
+(35, 0, 0, 0, 52, '2026-03-22 10:35:08'),
+(36, 0, 0, 0, 53, '2026-03-22 10:35:08'),
+(37, 0, 0, 0, 54, '2026-03-22 10:35:08'),
+(38, 0, 0, 0, 55, '2026-03-22 10:35:08'),
+(39, 0, 0, 0, 56, '2026-03-22 10:35:08'),
+(40, 0, 0, 0, 57, '2026-03-22 10:35:08'),
+(41, 0, 0, 0, 58, '2026-03-22 10:35:08'),
+(42, 0, 0, 0, 59, '2026-03-22 10:35:08'),
+(43, 0, 0, 0, 60, '2026-03-22 10:35:08'),
+(44, 0, 0, 0, 61, '2026-03-22 10:35:08'),
+(45, 0, 0, 0, 62, '2026-03-22 10:35:08'),
+(46, 0, 0, 0, 63, '2026-03-22 10:35:08'),
+(47, 0, 0, 0, 64, '2026-03-22 10:35:08'),
+(48, 0, 0, 0, 65, '2026-03-22 10:35:08'),
+(49, 0, 0, 0, 66, '2026-03-22 10:35:08'),
+(50, 0, 0, 0, 67, '2026-03-22 10:35:08'),
+(51, 0, 0, 0, 68, '2026-03-22 10:35:08'),
+(52, 0, 0, 0, 69, '2026-03-22 10:35:08'),
+(53, 0, 0, 0, 70, '2026-03-22 10:35:08'),
+(54, 0, 0, 0, 71, '2026-03-22 10:35:08'),
+(55, 0, 0, 0, 75, '2026-03-22 10:35:08'),
+(56, 0, 0, 0, 76, '2026-03-22 10:35:08'),
+(57, 0, 0, 0, 91, '2026-03-23 09:53:11'),
+(58, 0, 0, 0, 104, '2026-03-23 10:09:07'),
+(59, 0, 0, 0, 105, '2026-03-24 10:09:08'),
+(60, 0, 0, 0, 106, '2026-03-24 10:18:34'),
+(61, 0, 0, 0, 107, '2026-03-24 10:18:34'),
+(62, 0, 0, 0, 108, '2026-03-24 10:30:19'),
+(63, 0, 0, 0, 109, '2026-03-24 10:30:19'),
+(64, 0, 0, 0, 110, '2026-03-24 10:30:19'),
+(65, 0, 0, 0, 111, '2026-03-24 10:30:19'),
+(66, 0, 0, 0, 112, '2026-03-24 10:30:19'),
+(67, 0, 0, 0, 113, '2026-03-24 10:36:16'),
+(68, 0, 0, 0, 114, '2026-03-24 10:36:16'),
+(69, 0, 0, 0, 115, '2026-03-24 10:36:16'),
+(70, 0, 0, 0, 88, '2026-03-30 11:15:46'),
+(71, 0, 0, 0, 89, '2026-03-30 11:15:46'),
+(72, 0, 0, 0, 90, '2026-03-30 11:15:46'),
+(73, 0, 0, 0, 92, '2026-03-30 11:15:46'),
+(74, 0, 0, 0, 98, '2026-03-30 11:42:38'),
+(75, 0, 0, 0, 99, '2026-03-30 11:42:38'),
+(76, 0, 0, 0, 100, '2026-03-30 11:42:38'),
+(77, 0, 0, 0, 103, '2026-03-31 10:03:28'),
+(78, 0, 0, 0, 124, '2026-03-31 12:06:48'),
+(79, 0, 0, 0, 125, '2026-03-31 12:06:48'),
+(80, 0, 0, 0, 79, '2026-04-01 08:02:12'),
+(81, 0, 0, 0, 129, '2026-04-01 08:48:32'),
+(82, 0, 0, 0, 120, '2026-05-20 12:33:15'),
+(83, 0, 0, 0, 105, '2026-06-10 11:24:24'),
+(84, 0, 0, 0, 106, '2026-06-10 11:24:24'),
+(85, 0, 0, 0, 107, '2026-06-10 11:24:24'),
+(86, 0, 0, 0, 52, '2026-07-06 09:57:11'),
+(87, 0, 0, 0, 130, '2026-07-13 13:55:00'),
+(88, 0, 0, 0, 168, '2026-07-14 09:54:49'),
+(89, 0, 0, 0, 165, '2026-07-27 06:19:20'),
+(90, 0, 0, 0, 166, '2026-07-27 06:19:20');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_course`
+--
+
+CREATE TABLE `tb_course` (
+  `ID` int(11) NOT NULL,
+  `CourseID` varchar(20) NOT NULL,
+  `Course` varchar(100) NOT NULL,
+  `Note` text DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tb_course`
+--
+
+INSERT INTO `tb_course` (`ID`, `CourseID`, `Course`, `Note`) VALUES
+(1, 'C001', 'រដ្ឋបាលទូទៅ និង មូលដ្ឋានគ្រឹះប្រើប្រាស់ Internet', '3month '),
+(2, 'C002', 'កម្មវិធី Google doc,Sheet,slide,canva', '3month price 30$  docs, sheets, presentation,canva,drive'),
+(3, 'C003', 'កម្មវិធី Adobe Photoshop & Adobe illustrator', '2 month  Photshop, illustrator price 30$'),
+(4, 'C004', 'Coding ', 'basic code:  code org, scratch , VBA     10$/month\r\nadvan:  C++ , basic Web (html, css,javascript, php)'),
+(6, 'C005', 'Testing for edit OK', 'edit tessting I also OK '),
+(7, 'D001', 'Google Docs,Google Sheets,Google Slide, Canva ', 'កម្រិតឌីជីថល ');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_invoices`
+--
+
+CREATE TABLE `tb_invoices` (
+  `id` int(11) NOT NULL,
+  `student_name` varchar(255) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `status` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `study_time` varchar(50) DEFAULT NULL,
+  `school_id` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tb_invoices`
+--
+
+INSERT INTO `tb_invoices` (`id`, `student_name`, `description`, `amount`, `status`, `created_at`, `study_time`, `school_id`) VALUES
+(19, 'ឈឿម ចាន់ឌី', 'y', 30.00, 0, '2026-01-21 12:39:27', '1:00 - 2:00 pm', 0),
+(20, 'ព្រេក សារ៉ាន', 'a', 30.00, 0, '2026-01-22 13:01:34', '1:00 - 2:00 pm', 0),
+(21, 'មុន្នី រក្សា', 's', 35.00, 0, '2026-01-22 13:13:24', '10:00 - 11:00 am', 0),
+(22, 'test1', 'yort ', 15.00, 0, '2026-02-11 06:37:52', '1:00 - 2:00 pm', 0),
+(23, 'តេស្ដ២', 'ns', 30.00, 0, '2026-03-22 09:04:25', '1:00 - 2:00 pm', 0),
+(24, 'ជឹម សុខចំរើន', 's', 20.00, 0, '2026-03-23 11:04:18', '5:00 - 6:00 pm', 0),
+(25, 'ឌី ម៉ារ៉ា ឌីន', 's', 20.00, 0, '2026-03-23 11:04:34', '5:00 - 6:00 pm', 0),
+(26, 'រុំា  សូរីសា', 's', 30.00, 0, '2026-03-23 11:06:02', '5:00 - 6:00 pm', 0),
+(27, 'សឺង ណាស៊ិន', 's', 30.00, 0, '2026-03-23 11:06:23', '6:00 - 7:00 pm', 0),
+(28, 'បុយ ផាន្នី', 's', 12.50, 0, '2026-03-23 11:07:04', '5:00 - 6:00 pm', 0),
+(29, 'តិត វល័ក្ខ', 's', 30.00, 0, '2026-03-23 11:07:34', '5:00 - 6:00 pm', 0),
+(30, 'ធន់ ឡៃហាវ', 'd', 15.00, 0, '2026-03-23 11:08:59', '5:00 - 6:00 pm', 0),
+(31, 'គីម សំអូន', 's', 25.00, 0, '2026-03-23 11:09:16', '4:00 - 5:00 pm', 0),
+(32, 'រ៉ា សារៀង', 'h', 15.00, 0, '2026-03-23 11:09:50', '4:00 - 5:00 pm', 0),
+(33, 'អ៊ិន ត្រា', 'w', 15.00, 0, '2026-03-23 11:11:48', '4:00 - 5:00 pm', 0),
+(34, 'សល សាវង្ស', 's', 10.00, 0, '2026-03-23 11:14:38', '4:00 - 5:00 pm', 0),
+(35, 'ផយ សុផល', 's', 12.50, 0, '2026-03-23 11:15:16', '4:00 - 5:00 pm', 0),
+(36, 'ថេត ឃីម', 's', 30.00, 0, '2026-03-23 11:16:01', '2:00 - 3:00 pm', 0),
+(37, 'សេង ដាឡែន ', 's', 25.00, 0, '2026-03-23 11:16:47', '2:00 - 3:00 pm', 0),
+(38, 'នឿម  ស្រីល័ក្ខ', 'រួចរាល់', 30.00, 0, '2026-03-23 11:18:40', '6:00 - 7:00 pm', 0),
+(39, 'គឿត តុលា', 'ស', 15.00, 0, '2026-03-23 11:19:34', '4:00 - 5:00 pm', 0),
+(40, 'យន់ សម្បត្ដិ', 's', 22.50, 0, '2026-03-23 11:20:34', '3:00 - 4:00 pm', 0),
+(41, 'ម៉ោង មីត', 's', 27.50, 0, '2026-03-23 11:21:13', '3:00 - 4:00 pm', 0),
+(42, 'គង់ ស្រីពេញ', 'j', 30.00, 0, '2026-03-23 11:23:21', '1:00 - 2:00 pm', 0),
+(43, 'ហេង សារុំ', '1', 30.00, 0, '2026-03-24 09:51:47', '1:00 - 2:00 pm', 0),
+(44, 'សឿត ណារ៉ែន', 'g', 30.00, 0, '2026-03-24 09:52:14', '1:00 - 2:00 pm', 0),
+(45, 'បុយ ផាន្នី', 'ស', 5.00, 0, '2026-03-24 10:10:27', '5:00 - 6:00 pm', 0),
+(46, 'បុយ ផាន្នី', 'z', 12.50, 0, '2026-03-24 10:13:03', '5:00 - 6:00 pm', 0),
+(47, 'មូសា ហាណាហ្វាយ ', 's', 10.00, 0, '2026-03-25 06:40:14', '6:00 - 7:00 pm', 0),
+(48, 'ផា សុភី', 'e', 12.50, 0, '2026-03-25 06:40:59', '6:00 - 7:00 pm', 0),
+(49, 'សឿប សារីណា', 's', 20.00, 0, '2026-03-25 10:01:20', '5:00 - 6:00 pm', 0),
+(50, 'សុខ ប្រសើរ', 'OK', 30.00, 0, '2026-03-27 10:55:02', '5:00 - 6:00 pm', 0),
+(51, 'ផ្លាំង ពរជ័យកុមារ', 'OK', 30.00, 0, '2026-03-28 13:52:47', '5:00 - 6:00 pm', 0),
+(52, 'ឆាក គីមលៀង ', 'DS', 30.00, 0, '2026-03-30 10:24:49', '4:00 - 5:00 pm', 0),
+(53, 'ឆាក គិមលៀង ', 'ដ', 30.00, 0, '2026-03-30 11:06:41', '4:00 - 5:00 pm', 0),
+(54, 'វី សុវណ្ណដារីយ៉ា', 'ដ', 30.00, 0, '2026-03-30 11:19:06', '5:00 - 6:00 pm', 0),
+(55, 'អ៊ាត ណាចា', 'with border price', 9.50, 0, '2026-04-01 07:29:30', '5:00 - 6:00 pm', 0),
+(56, 'អ៊ិន វាសនា ', 'border ', 9.50, 0, '2026-04-01 07:29:51', '6:00 - 7:00 pm', 0),
+(57, 'វិច ធារ៉ា', 'gg', 30.00, 0, '2026-04-02 12:43:16', '6:00 - 7:00 pm', 0),
+(58, 'ពុធ ប៊ុនឆាង', 'រួច', 30.00, 0, '2026-04-21 07:49:39', '08:00', 0),
+(59, ' ពុធ ប៊ុនឈុន', 'រួច', 30.00, 0, '2026-04-21 07:50:14', '6:00 - 7:00 pm', 0),
+(60, 'វឿង ខាំមីង', 'រួច', 30.00, 0, '2026-04-21 07:50:40', '6:00 - 7:00 pm', 0),
+(61, 'សាំ គឹមចុង', 'រួច', 30.00, 0, '2026-04-21 07:58:17', '6:00 - 7:00 pm', 0),
+(62, 'ហឿម សុខរក្សា', 'រួច', 30.00, 0, '2026-04-21 09:14:20', '4:00 - 5:00 pm', 0),
+(63, 'ម៉ក់ ពោរ', 'រួច', 30.00, 0, '2026-04-21 09:16:33', '4:00 - 5:00 pm', 0),
+(64, 'សាំ រុី', 'រួចរាល់', 30.00, 0, '2026-04-22 10:19:27', '6:00 - 7:00 pm', 0),
+(65, 'យ៉ាន ចាន់មី', 'រួចរាល់', 30.00, 0, '2026-04-23 12:26:26', '6:00 - 7:00 pm', 0),
+(66, 'ជឿន សុវន្នី', 'រួចរាល់', 30.00, 0, '2026-04-23 12:27:31', '6:00 - 7:00 pm', 0),
+(67, 'ម៉ន សាមី', 'រួចរាល់', 30.00, 0, '2026-04-23 12:28:09', '6:00 - 7:00 pm', 0),
+(68, 'ភក្ដី សុផាន់ដា', 'ត ', 10.00, 0, '2026-05-11 07:42:17', '2:00 - 3:00 pm', 0),
+(69, 'ណុល វិសាល', 'រួច', 30.00, 0, '2026-05-11 07:42:43', '4:00 - 5:00 pm', 0),
+(70, 'ម៉ាង សុប៊ីន', 'រួច', 30.00, 0, '2026-05-11 11:35:40', '2:00 - 3:00 pm', 0),
+(71, 'ជឿន សុភាន', 'រួចរាល់', 30.00, 0, '2026-05-11 13:16:04', '7-8 ល្ងាច', 0),
+(72, 'ពុធ សុខលី', 'ទី១', 7.50, 0, '2026-05-23 10:14:08', '6:00 - 7:00 pm', 0),
+(73, 'គង់ ចាន់ណៃ', 'ពាក់កណ្ដាល', 15.00, 0, '2026-06-01 11:31:58', '6:00 - 7:00 pm', 0),
+(74, 'ធាំង ផានិត', 'ពាក់កណ្ដាល', 15.00, 0, '2026-06-09 09:18:58', '6:00 - 7:00 pm', 0),
+(75, 'តិត វល័ក្ខ', 'បង់សម្រាប់ ខែ ៦', 5.00, 0, '2026-06-09 09:24:19', '5:00 - 6:00 pm', 0),
+(76, 'នី សំនៀង', 'ឌីជីថល', 17.50, 0, '2026-06-09 09:25:36', '4:00 - 5:00 pm', 0),
+(77, 'ឡាប លីនិញ', 'រួចរាល់', 30.00, 0, '2026-06-10 06:54:06', '5:00 - 6:00 pm', 0),
+(78, 'អឿមគង់ ធូរេន', 'រួចរាល់', 15.00, 0, '2026-06-11 07:26:45', '2:00 - 3:00 pm', 0),
+(79, 'រ៉ា សារៀង', 'បង់ រួច', 15.00, 0, '2026-06-11 08:12:26', '4:00 - 5:00 pm', 0),
+(80, 'ភក្ដី សុផាន់ដា', 'បង់ខែ ', 5.00, 0, '2026-06-13 07:06:14', '2:00 - 3:00 pm', 0),
+(81, 'ភក្ដី សុផាន់ដា', 'd', 2.50, 0, '2026-06-16 07:10:06', '2:00 - 3:00 pm', 0),
+(82, 'ប៉ាវ សីហា', 'រួចរាល់', 30.00, 0, '2026-06-25 11:54:50', '6:00 - 7:00 pm', 0),
+(83, 'គង់ ចាន់ណៃ', 'រួចរាល់', 15.00, 0, '2026-06-27 08:52:59', '6:00 - 7:00 pm', 0),
+(84, 'សោន សូវណ្ណលីដា', 'បង់ខែ 7', 5.00, 0, '2026-07-13 07:03:12', '2:00 - 3:00 pm', 0),
+(85, 'ហេនស៊ាង ហ័រ', 'បង់ខែ ៧', 5.00, 0, '2026-07-15 07:24:07', '2:00 - 3:00 pm', 0),
+(86, 'ភក្ដី សុផាន់ដា', 'ខែ៧', 2.50, 0, '2026-07-16 06:53:22', '2:00 - 3:00 pm', 0),
+(87, 'ឡាក់ ប៊ីឡាញ', 'រួចរាល់', 30.00, 0, '2026-07-22 09:28:35', '3:00 - 4:00 pm', 0),
+(88, 'ឡា សុឡែម', 'ពាក់កណ្ដាល', 12.50, 0, '2026-07-30 13:05:01', '5:00 - 6:00 pm', 0),
+(89, 'ឈឿន យូរៀន', 'សល់២០', 10.00, 0, '2026-07-30 13:21:26', '2:00 - 3:00 pm', 0),
+(90, 'ភក្ដី សុផាន់ដា', 'monthly', 10.00, 0, '2026-07-30 13:36:58', '2:00 - 3:00 pm', 0),
+(91, 'សៀងហៃ សៀងហន', 'ខ្លះ', 10.00, 0, '2026-08-06 09:19:16', '3:00 - 4:00 pm', 0),
+(92, 'ហ៊ីង គិមហី', 'ខ្លះ', 10.00, 0, '2026-08-06 09:19:51', '3:00 - 4:00 pm', 0),
+(93, 'ឈូក លីណា', 'រួច', 30.00, 0, '2026-08-11 09:02:15', '3:00 - 4:00 pm', 0),
+(97, 'សៀងហៃ សៀងហន', 'រួច', 20.00, 0, '2026-08-11 09:10:58', '3:00 - 4:00 pm', 0),
+(95, 'ហឿម មេត្តា', 'បង់ខែ', 5.00, 0, '2026-08-11 09:03:25', '08:00', 0),
+(96, 'ស៊ីនិត  ម៉េងហុង', 'បង់ខែ', 5.00, 0, '2026-08-11 09:03:43', '08:00', 0),
+(98, 'សារី សីហា', 's', 10.00, 0, '2026-08-17 07:47:00', '6:00 - 7:00 pm', 0),
+(99, 'ហេនស៊ាង ហ័រ', 'បង់ ', 5.00, 0, '2026-08-18 08:06:28', '2:00 - 3:00 pm', 0),
+(100, 'រៀវ សំអាត', 'រួចរាល់', 25.00, 0, '2026-08-19 10:37:10', '5:00 - 6:00 pm', 0),
+(101, 'អ៊ុម ជាវណ្ណរី', 'រួចរាល់', 25.00, 0, '2026-08-19 10:37:29', '5:00 - 6:00 pm', 0),
+(102, 'បូរី អមរា (ត)', 'រួចរាល់', 10.00, 0, '2026-08-20 06:35:38', '6:00 - 7:00 pm', 0),
+(104, 'ស៊ាន រចនា ', 'ស', 15.00, 0, '2026-08-20 10:35:11', '2:00 - 3:00 pm', 0),
+(105, 'ហឿម មេត្តា', 'paid 8-6-26', 5.00, 0, '2026-08-24 09:36:41', '08:00', 0),
+(106, 'ដុង ឌឿ', 'រួចរាល់', 25.00, 0, '2026-08-24 12:03:56', '7-8 ល្ងាច', 0),
+(107, 'ចិន យ៉ាង', 'ពាក់កណ្ដាល', 12.50, 0, '2026-08-25 10:18:05', '3:00 - 4:00 pm', 0),
+(108, 'សៅ សិម', 'ពាក់កណ្ដាល', 12.50, 0, '2026-08-25 10:18:22', '3:00 - 4:00 pm', 0),
+(109, 'វ៉ិត សុវណ្ណ', 'ពាក់កណ្ដាល', 12.50, 0, '2026-08-25 10:18:42', '3:00 - 4:00 pm', 0),
+(110, 'ពុធ ប៊ុនឆាង', 'រួចរាល់', 30.00, 0, '2026-08-26 10:34:37', '7-8 ល្ងាច', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_schools`
+--
+
+CREATE TABLE `tb_schools` (
+  `id` int(11) NOT NULL,
+  `school_name` varchar(255) NOT NULL,
+  `school_name_kh` text NOT NULL,
+  `logo` varchar(100) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tb_schools`
+--
+
+INSERT INTO `tb_schools` (`id`, `school_name`, `school_name_kh`, `logo`) VALUES
+(1, 'Meakea_computer I', 'មាគ៌ាកុំព្យូទ័រ', '696d0a595fb4a.jpg'),
+(2, 'Meakea_computer II', 'មាគ៌ាកុំព្យូទ័រ', '696d0a6a8e479.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_siem_logs`
+--
+
+CREATE TABLE `tb_siem_logs` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `action` varchar(50) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `tb_siem_logs`
+--
+
+INSERT INTO `tb_siem_logs` (`id`, `username`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 'adminmeakea', 'CLEAR_LOGS', 'Cleared all SIEM logs', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 15:58:53'),
+(2, 'adminmeakea', 'ADD_USER', 'Added user: yort', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:00:53'),
+(3, 'adminmeakea', 'ADD_USER', 'Added user: chandy', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:01:12'),
+(4, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:01:17'),
+(5, 'chandy', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:01:27'),
+(6, 'chandy', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:08:14'),
+(7, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 16:08:23'),
+(8, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-01 22:58:14'),
+(9, 'admin', 'LOGIN_FAILED', 'User not found', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 00:11:22'),
+(10, 'yourt', 'LOGIN_FAILED', 'User not found', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 00:11:45'),
+(11, 'yort', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 00:12:03'),
+(12, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 00:13:45'),
+(13, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 23:16:35'),
+(14, 'yort', 'REGISTER_STUDENT', 'Registered student: តេស្ដ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 23:23:54'),
+(15, 'yort', 'REGISTER_STUDENT_STUDY', 'Registered student: តេស្ដ១ with course ID: 4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-04 23:25:00'),
+(16, 'meakkea@gmail.com', 'LOGIN_FAILED', 'User not found', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-07 12:48:45'),
+(17, 'Yort', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-07 12:49:03'),
+(18, 'yort', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-07 12:49:17'),
+(19, 'yort', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-07 12:49:31'),
+(20, 'adminmeakea', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-07 12:49:51'),
+(21, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-07 12:50:23'),
+(22, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-09 11:28:07'),
+(23, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:32:51'),
+(24, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-09 11:38:14'),
+(25, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:51:20'),
+(26, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:54:21'),
+(27, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:57:46'),
+(28, 'yort', 'REGISTER_STUDENT', 'Registered student: test1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:58:39'),
+(29, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 63 (test1)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 11:59:26'),
+(30, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 12:01:07'),
+(31, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 12:09:46'),
+(32, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-09 12:42:23'),
+(33, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 00:27:14'),
+(34, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 58 (ឃិត  សុខុន)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 00:43:17'),
+(35, 'yort', 'REGISTER_STUDENT', 'Registered student: ធន់ ឡៃហាវ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 00:47:18'),
+(36, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 48 (ឃឿម ម៉ាលី)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 01:00:23'),
+(37, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 06:44:00'),
+(38, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 06:44:55'),
+(39, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 10:54:23'),
+(40, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-10 10:55:38'),
+(41, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-11 06:35:40'),
+(42, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-11 06:36:17'),
+(43, 'yort', 'ADD_INVOICE', 'Created invoice for test1 (15)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-11 06:37:52'),
+(44, 'yort', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-11 06:39:12'),
+(45, 'adminmeakea', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-11 06:39:34'),
+(46, 'adminmeakea', 'LOGIN_FAILED', 'Invalid password attempt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:07:43'),
+(47, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:08:13'),
+(48, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 34 (គង់ ស្រីពេញ)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:12:09'),
+(49, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 33 (សឿត ណារ៉ែន់)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:12:57'),
+(50, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ហេង សារុំ with course ID: 1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:17:34'),
+(51, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 35 (ព្រេក សារ៉ាន់)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:21:54'),
+(52, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 33 (សឿត ណារ៉ែន)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:22:15'),
+(53, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:35:05'),
+(54, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-13 12:35:07'),
+(55, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 01:54:04'),
+(56, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 60 (រឹទ្ធ ធិរាជ្យ)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 01:56:39'),
+(57, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 59 (ស៊ុតសេង សាលីណា)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 02:09:49'),
+(58, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 44 (វ៉ាន់ ឡាឡៃយ៉ា)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 02:18:06'),
+(59, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 39 (វង់ ចន្រ្ទា)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 02:52:48'),
+(60, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 40 (សួម ពិសី)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 02:54:52'),
+(61, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 55 (ពុឺាង បញ្ញា )', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 03:09:18'),
+(62, 'yort', 'UPDATE_STUDENT', 'Updated student ID: 55 (ពុឹាង បញ្ញា )', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-02-16 03:11:10'),
+(63, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 03:55:43'),
+(64, 'yort', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 04:54:09'),
+(65, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 04:54:11'),
+(66, 'yort', 'ADD_FINISHED_STUDENT', 'Added finished student: test1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 05:38:21'),
+(67, 'yort', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 05:39:34'),
+(68, 'yort', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-02-18 05:39:35'),
+(69, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', '2026-03-07 08:23:33'),
+(70, 'sokea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 08:24:08'),
+(71, 'sokea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 15:50:01'),
+(72, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 07:30:24'),
+(73, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 07:51:42'),
+(74, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 07:51:59'),
+(75, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:05:33'),
+(76, 'sokea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:05:41'),
+(77, 'sokea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:05:55'),
+(78, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:06:02'),
+(79, 'adminmeakea', 'ADD_USER', 'Added user: dy-ii', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:06:43'),
+(80, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:06:46'),
+(81, 'dy-ii', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:06:57'),
+(82, 'dy-ii', 'REGISTER_STUDENT', 'Registered student: តេស្ដ២', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:08:54'),
+(83, 'dy-ii', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:21:41'),
+(84, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:21:52'),
+(85, 'adminmeakea', 'ADD_USER', 'Added user: sokea-ii', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:22:21'),
+(86, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:22:26'),
+(87, 'sokea-ii', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:22:35'),
+(88, 'sokea-ii', 'ADD_SCHOOL', 'Added school: meak-III', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:24:06'),
+(89, 'sokea-ii', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:24:46'),
+(90, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:25:04'),
+(91, 'adminmeakea', 'ADD_USER', 'Added user: sokea-iii', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:25:28'),
+(92, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:25:32'),
+(93, 'sokea-iii', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:25:40'),
+(94, 'sokea-iii', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:37:32'),
+(95, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:37:38'),
+(96, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:54:51'),
+(97, 'sokea-ii', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:55:02'),
+(98, 'sokea-ii', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:55:36'),
+(99, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:55:43'),
+(100, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:56:22'),
+(101, 'sokea-ii', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 08:56:31'),
+(102, 'sokea-ii', 'ADD_INVOICE', 'Created invoice for តេស្ដ២ (30.00)', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:04:25'),
+(103, 'sokea-ii', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:04:53'),
+(104, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:05:03'),
+(105, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:16:16'),
+(106, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:26:28'),
+(107, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:26:36'),
+(108, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:26:43'),
+(109, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:27:10'),
+(110, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:33:09'),
+(111, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:33:45'),
+(112, 'adminmeakea', 'LOGIN', 'User logged in successfully', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:41:03'),
+(113, 'adminmeakea', 'LOGOUT', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 09:41:23'),
+(114, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 10:34:54'),
+(115, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 10:35:14'),
+(116, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-22 10:35:28'),
+(117, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-22 11:14:48'),
+(118, 'chandy', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.101', 'Mozilla/5.0 (Linux; U; Android 15; en-us; CPH2577 Build/AP3A.240617.008) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.5970.168 Mobile Safari/537.36 HeyTapBrowser/45.13.9.1', '2026-03-22 11:19:21'),
+(119, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-22 11:30:57'),
+(120, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-22 11:32:08'),
+(121, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.101', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-22 11:32:29'),
+(122, 'adminmeakea', 'LOGIN', 'User logged in successfully', '117.20.112.99', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Safari/537.36', '2026-03-22 12:11:19'),
+(123, 'adminmeakea', 'LOGIN', 'User logged in successfully', '117.20.112.99', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Safari/537.36', '2026-03-22 12:19:40'),
+(124, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 07:10:38'),
+(125, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 42 (ឡយ កក្កដា)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 07:11:32'),
+(126, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: ភក្ដី សុផាន់ដា', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 07:29:53'),
+(127, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ធឺន ថង with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 07:33:02'),
+(128, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: អឿម គង ធូរេន with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 07:36:06'),
+(129, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 70 (អឿម គង ធូរេន)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:04:46'),
+(130, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: ថេត ឃីម', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:07:51'),
+(131, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សេង ដាឡែន  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:10:00'),
+(132, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: កៃ រដ្ឋា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:12:44'),
+(133, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: យន់ សម្បត្ដិ with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:16:52'),
+(134, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ម៉ោង មីត with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:18:45'),
+(135, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: ម៉ុន ប៊ុនថា', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:19:59'),
+(136, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: អ៊ិន ត្រា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:23:26'),
+(137, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: គឿត តុលា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:25:27'),
+(138, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: ចាប វល័ក្ខ', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:26:38'),
+(139, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សល សាវង្ស with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:29:14'),
+(140, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ផយ សុផល with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:30:14'),
+(141, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ឆាក គីមលៀង  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:31:47'),
+(142, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: រ៉ា សារៀង with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:33:43'),
+(143, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: នី សំនៀង with course ID: 2', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:34:48'),
+(144, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: គីម សំអូន with course ID: 2', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:36:36'),
+(145, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ធន់ ឡៃហាវ with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:39:30'),
+(146, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សឿប សារីណា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:41:20'),
+(147, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: តិត វល័ក្ខ with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:43:57'),
+(148, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: បុយ ផាន្នី with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:48:43'),
+(149, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: រុំា  សូរីសា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:51:11'),
+(150, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ឌី ម៉ារ៉ា ឌីន with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:52:21'),
+(151, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ជឹម សុខចំរើន with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:53:20'),
+(152, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សឺង ណាស៊ិន with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 08:55:40'),
+(153, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 09:51:57'),
+(154, 'adminmeakea', 'DELETE_FINISHED_STUDENT', 'Deleted finished study ID: 76', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 09:52:35'),
+(155, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 09:53:17'),
+(156, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 10:05:52'),
+(157, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: នឿម  ស្រីល័ក្ខ', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 10:06:59'),
+(158, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 10:09:11'),
+(159, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 10:42:01'),
+(160, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 82 (ឆាក គីមលៀង )', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 10:43:21'),
+(161, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 82 (ឆាក គីមលៀង )', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:00:10'),
+(162, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:03:37'),
+(163, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ជឹម សុខចំរើន (20)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:04:18'),
+(164, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ឌី ម៉ារ៉ា ឌីន (20.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:04:34'),
+(165, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for រុំា  សូរីសា (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:06:02'),
+(166, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for សឺង ណាស៊ិន (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:06:23'),
+(167, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for បុយ ផាន្នី (12.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:07:04'),
+(168, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for តិត វល័ក្ខ (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:07:34'),
+(169, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ធន់ ឡៃហាវ (15)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:08:59'),
+(170, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for គីម សំអូន (25.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:09:16'),
+(171, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for រ៉ា សារៀង (15)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:09:50'),
+(172, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for អ៊ិន ត្រា (15)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 11:11:48'),
+(173, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for សល សាវង្ស (10)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:14:38'),
+(174, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ផយ សុផល (12.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:15:16'),
+(175, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ថេត ឃីម (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:16:01'),
+(176, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for សេង ដាឡែន  (25)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:16:47'),
+(177, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for នឿម  ស្រីល័ក្ខ (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:18:40'),
+(178, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for គឿត តុលា (15)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:19:34'),
+(179, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for យន់ សម្បត្ដិ (22.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:20:34'),
+(180, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ម៉ោង មីត (27.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:21:13'),
+(181, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for គង់ ស្រីពេញ (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:23:21'),
+(182, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 72', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:28:55'),
+(183, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 73', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:29:00'),
+(184, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 77', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 11:29:07'),
+(185, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:09:49'),
+(186, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 93 (សឺង ណាស៊ិន)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:12:06'),
+(187, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:28:00'),
+(188, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:28:27'),
+(189, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 55 (ញ៉ឹង បញ្ញា )', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:29:04'),
+(190, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:29:08'),
+(191, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 12:30:38'),
+(192, 'adminmeakkea', 'LOGIN_FAILED', 'User not found', '116.212.152.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 02:20:21'),
+(193, 'adminmeakea', 'LOGIN', 'User logged in successfully', '116.212.152.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 02:20:35'),
+(194, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 07:14:23'),
+(195, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 07:46:54'),
+(196, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 08:12:07'),
+(197, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 71 (ថេត ឃីម)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 08:12:27'),
+(198, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 73 (កៃ រដ្ឋា)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 08:32:14'),
+(199, 'Chandy', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:49:59'),
+(200, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:50:23'),
+(201, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:50:58'),
+(202, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:51:15'),
+(203, 'chandy', 'ADD_INVOICE', 'Created invoice for ហេង សារុំ (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:51:47'),
+(204, 'chandy', 'ADD_INVOICE', 'Created invoice for សឿត ណារ៉ែន (30.00)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:52:14'),
+(205, 'chandy', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:54:34'),
+(206, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 09:54:43'),
+(207, 'chandy', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:04:15'),
+(208, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:06:23'),
+(209, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: យង់ យ៉ត with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:07:51'),
+(210, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:09:13'),
+(211, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:10:03'),
+(212, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for បុយ ផាន្នី (5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:10:27'),
+(213, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for បុយ ផាន្នី (12.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:13:03'),
+(214, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ខី ខេមរ៉ា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:16:40'),
+(215, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: បូរី អមរា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:18:11'),
+(216, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:18:38'),
+(217, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:23:42'),
+(218, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ច្រឹក ស៊ីវវុន  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:25:09'),
+(219, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: អាន ស្រីពៅ with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:26:20'),
+(220, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: នំ នឿម  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:27:22'),
+(221, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ចិក ចិនណា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:28:35'),
+(222, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ធុច សុវណ្ណដា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:29:49'),
+(223, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:30:22'),
+(224, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:31:57'),
+(225, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សោន សូវណ្ណលីដា with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:33:03'),
+(226, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សុត ប៊ិន with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:34:29');
+INSERT INTO `tb_siem_logs` (`id`, `username`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
+(227, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សំ ស្រីនាង with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:35:42'),
+(228, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:36:18'),
+(229, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:36:26'),
+(230, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:37:10'),
+(231, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 10:38:34'),
+(232, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:12:00'),
+(233, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:12:38'),
+(234, 'adminmeakea', 'ADD_USER', 'Added user: sarak', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:13:04'),
+(235, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:13:07'),
+(236, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:13:25'),
+(237, 'sarak', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:13:32'),
+(238, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:15:20'),
+(239, 'sarak', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:17:40'),
+(240, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:17:50'),
+(241, 'sarak', 'REGISTER_STUDENT_STUDY', 'Registered student: មូសា ហាណាហ្វាយ  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:48:46'),
+(242, 'sarak', 'REGISTER_STUDENT_STUDY', 'Registered student: លាប ចាន់ថន  with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:50:41'),
+(243, 'sarak', 'REGISTER_STUDENT_STUDY', 'Registered student: ពុធ សុខលី with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:52:29'),
+(244, 'sarak', 'REGISTER_STUDENT_STUDY', 'Registered student: ផា សុភី with course ID: 1', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-24 11:54:37'),
+(245, 'Chandy', 'LOGIN_FAILED', 'Invalid password attempt', '117.20.117.7', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-24 12:17:43'),
+(246, 'chandy', 'LOGIN', 'User logged in successfully', '117.20.117.7', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-24 12:17:56'),
+(247, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 06:39:49'),
+(248, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for មូសា ហាណាហ្វាយ  (10)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 06:40:14'),
+(249, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ផា សុភី (12.5)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 06:40:59'),
+(250, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 06:43:30'),
+(251, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 06:43:44'),
+(252, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 08:02:13'),
+(253, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 08:16:45'),
+(254, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 08:53:12'),
+(255, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 09:58:03'),
+(256, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for សឿប សារីណា (20)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 10:01:20'),
+(257, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 87 (សឿប សារីណា)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 10:24:38'),
+(258, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 10:56:07'),
+(259, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:17:17'),
+(260, 'chandy', 'REGISTER_STUDENT', 'Registered student: តឿម ស្រីនិត', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:19:02'),
+(261, 'chandy', 'REGISTER_STUDENT', 'Registered student: ទាវ ពិសី', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:20:26'),
+(262, 'chandy', 'REGISTER_STUDENT', 'Registered student: តឿ គិមលី', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:21:12'),
+(263, 'chandy', 'REGISTER_STUDENT', 'Registered student: តឿ គិមលី', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:21:30'),
+(264, 'chandy', 'REGISTER_STUDENT', 'Registered student: ធី ស្រីណា', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:22:03'),
+(265, 'chandy', 'REGISTER_STUDENT', 'Registered student: ម៉ៃ រស្មី', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:23:38'),
+(266, 'chandy', 'REGISTER_STUDENT', 'Registered student: សុខ ប្រសើរ', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:29:01'),
+(267, 'chandy', 'REGISTER_STUDENT', 'Registered student: ហឿម សុខរក្សា', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:29:49'),
+(268, 'chandy', 'REGISTER_STUDENT', 'Registered student: ផ្លាំង ពរជ័យកុមារ', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:30:51'),
+(269, 'chandy', 'REGISTER_STUDENT', 'Registered student: ផ្លាំង ពរជ័យកុមារ', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:31:51'),
+(270, 'chandy', 'REGISTER_STUDENT', 'Registered student: សុខ ប្រសើរ', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:32:35'),
+(271, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-25 12:52:55'),
+(272, 'adminmeakea', 'LOGIN', 'User logged in successfully', '117.20.113.113', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-25 15:58:22'),
+(273, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 06:44:41'),
+(274, 'adminmeakea', 'DELETE_STUDENT', 'Deleted student ID: 107', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 06:45:17'),
+(275, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 06:46:52'),
+(276, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 06:47:09'),
+(277, 'meakea', 'DELETE_SCHOOL', 'Deleted school ID: 3', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 06:49:43'),
+(278, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 109 (ផា សុភី)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 07:18:57'),
+(279, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 108 (ពុធ សុខលី)', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 07:19:24'),
+(280, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 106 (មូសា ហាណាហ្វាយ )', '175.100.79.187', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 07:19:40'),
+(281, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 11:07:34'),
+(282, 'chandy', 'REGISTER_STUDENT', 'Registered student: វិច ធារ៉ា', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 11:39:02'),
+(283, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-26 14:25:59'),
+(284, 'Chandy', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-27 10:53:29'),
+(285, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-27 10:53:36'),
+(286, 'chandy', 'ADD_INVOICE', 'Created invoice for សុខ ប្រសើរ (30.00)', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-27 10:55:02'),
+(287, 'Chandy', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-28 13:52:14'),
+(288, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-28 13:52:26'),
+(289, 'chandy', 'ADD_INVOICE', 'Created invoice for ផ្លាំង ពរជ័យកុមារ (30.00)', '175.100.79.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-28 13:52:47'),
+(290, 'meakea', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:50:37'),
+(291, 'sokea', 'LOGIN_FAILED', 'Invalid password attempt', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:50:47'),
+(292, 'meakkea', 'LOGIN_FAILED', 'User not found', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:51:05'),
+(293, 'adminmeakkea', 'LOGIN_FAILED', 'User not found', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:51:42'),
+(294, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:52:04'),
+(295, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:53:37'),
+(296, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-30 06:53:54'),
+(297, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 07:18:40'),
+(298, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:24:14'),
+(299, 'sarak', 'ADD_INVOICE', 'Created invoice for ឆាក គីមលៀង  (30.00)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:24:49'),
+(300, 'sarak', 'UPDATE_STUDENT', 'Updated student ID: 82 (ឆាក គិមលៀង )', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:25:38'),
+(301, 'sarak', 'UPDATE_STUDENT', 'Updated student ID: 81 (ផយ សុផល)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:28:36'),
+(302, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:35:15'),
+(303, 'sarak', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:44:17'),
+(304, 'sarak', 'UPDATE_STUDENT', 'Updated student ID: 82 (ឆាក គិមលៀង )', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 10:44:59'),
+(305, 'sarak', 'UPDATE_STUDENT', 'Updated student ID: 80 (សល សាវង្ស)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:03:39'),
+(306, 'sarak', 'ADD_INVOICE', 'Created invoice for ឆាក គិមលៀង  (30.00)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:06:41'),
+(307, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:15:02'),
+(308, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:15:49'),
+(309, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:17:28'),
+(310, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: វី សុវណ្ណដារីយ៉ា with course ID: 2', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:18:43'),
+(311, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for វី សុវណ្ណដារីយ៉ា (30.00)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:19:06'),
+(312, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:30:08'),
+(313, 'chandy', 'LOGOUT', 'User logged out', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:30:15'),
+(314, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:30:29'),
+(315, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 90 (រុំា  សូរីសា)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:36:01'),
+(316, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 89 (បូយ ផាន្នី)', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:36:49'),
+(317, 'meakea', 'LOGOUT', 'User logged out', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:41:44'),
+(318, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:42:11'),
+(319, 'meakea', 'LOGOUT', 'User logged out', '175.100.79.159', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 11:42:48'),
+(320, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:47:39'),
+(321, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:47:53'),
+(322, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:48:07'),
+(323, 'meakea', 'ADD_USER', 'Added user: meakea1', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:49:05'),
+(324, 'meakea', 'LOGOUT', 'User logged out', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:49:10'),
+(325, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 06:49:15'),
+(326, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 09:39:20'),
+(327, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 82 (ឆាត គិមលៀង )', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 09:39:46'),
+(328, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 10:00:44'),
+(329, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 93 (សឺង ណាស៊ិន)', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 10:01:36'),
+(330, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 10:03:31'),
+(331, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 10:12:20'),
+(332, 'adminmeakea', 'ADD_COURSE', 'Added course: Google Docs,Google Sheets,Google Slide, Canva  (D001)', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 10:14:37'),
+(333, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 11:03:53'),
+(334, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: អ៊ាត ណាចា', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 11:04:59'),
+(335, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: អ៊ិន វាសនា ', '175.100.79.130', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 11:07:13'),
+(336, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.191', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-31 12:04:30'),
+(337, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.191', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-31 12:04:36'),
+(338, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.191', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-31 12:04:58'),
+(339, 'adminmeakea', 'LOGOUT', 'User logged out', '117.20.113.28', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-03-31 12:06:57'),
+(340, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:28:37'),
+(341, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for អ៊ាត ណាចា (9.5)', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:29:30'),
+(342, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for អ៊ិន វាសនា  (9.5)', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:29:51'),
+(343, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 48', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:30:41'),
+(344, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 49', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:30:45'),
+(345, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:58:49'),
+(346, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:02:15'),
+(347, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:02:28'),
+(348, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 69 (ធឺន ថង)', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:02:54'),
+(349, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:11:47'),
+(350, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:20:34'),
+(351, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: យឹង ចរិយា with course ID: 1', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:22:03'),
+(352, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ព្រហ្ម សុធីណា with course ID: 1', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:23:27'),
+(353, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 125 (យឹង ចរិយា)', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:23:49'),
+(354, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: និន ស្រីនីត with course ID: 1', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:31:51'),
+(355, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:32:15'),
+(356, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 08:34:37'),
+(357, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-01 08:43:38'),
+(358, 'meakea', 'REGISTER_STUDENT', 'Registered student: ធត់ ថាន', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-01 08:46:28'),
+(359, 'meakea', 'LOGOUT', 'User logged out', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-01 08:49:12'),
+(360, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.133', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-01 08:54:23'),
+(361, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.191', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:46:09'),
+(362, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.191', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 12:42:22'),
+(363, 'chandy', 'ADD_INVOICE', 'Created invoice for វិច ធារ៉ា (30.00)', '175.100.59.191', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 12:43:16'),
+(364, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.48', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-04 13:03:03'),
+(365, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.239', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-07 13:54:22'),
+(366, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-10 12:48:32'),
+(367, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.158', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-19 13:23:46'),
+(368, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:27:52'),
+(369, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ពុធ ប៊ុនឆាង with course ID: 3', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:30:55'),
+(370, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ម៉ក់ ពោរ with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:32:32'),
+(371, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student:  ពុធ ប៊ុនឈុន with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:43:11'),
+(372, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ម៉ន សាមី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:44:44'),
+(373, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 132 (ម៉ន សាមី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:45:37'),
+(374, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: វឿង ខាំមីង with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:48:20'),
+(375, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ពុធ ប៊ុនឆាង (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:49:39'),
+(376, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for  ពុធ ប៊ុនឈុន (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:50:14'),
+(377, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for វឿង ខាំមីង (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:50:40'),
+(378, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: សាំ គឹមចុង with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:56:50'),
+(379, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 134 (សាំ គឹមចុង)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:57:39'),
+(380, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for សាំ គឹមចុង (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 07:58:17'),
+(381, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: យ៉ាន ចាន់មី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:00:03'),
+(382, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ជឿន សុវនី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:05:25'),
+(383, 'adminmeakea', 'ADD_USER', 'Added user: meakea2', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:08:10'),
+(384, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:08:12'),
+(385, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:08:23'),
+(386, 'meakea2', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:08:58'),
+(387, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:09:05'),
+(388, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 130 (ម៉ក់ ពោរ)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:09:17'),
+(389, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:09:21'),
+(390, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:09:27'),
+(391, 'meakea2', 'REGISTER_STUDENT_STUDY', 'Registered student: ទាវ ពិសី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:19:05'),
+(392, 'meakea2', 'REGISTER_STUDENT_STUDY', 'Registered student: ណុល វិសាល with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 08:30:20'),
+(393, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:07:52'),
+(394, 'meakea2', 'REGISTER_STUDENT_STUDY', 'Registered student: ហឿម សុខរក្សា with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:09:00'),
+(395, 'meakea2', 'ADD_INVOICE', 'Created invoice for ហឿម សុខរក្សា (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:14:20'),
+(396, 'meakea2', 'ADD_INVOICE', 'Created invoice for ម៉ក់ ពោរ (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:16:33'),
+(397, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 130 (ម៉ក់ ពោរ)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:18:20'),
+(398, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 139 (ហឿម សុខរក្សា)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:22:52'),
+(399, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 09:30:38'),
+(400, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 10:23:50'),
+(401, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 119 (ផ្លាំង ពរជ័យកុមារ)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 10:24:53'),
+(402, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:11:59'),
+(403, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ជឿន សុវន្នី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:18:13'),
+(404, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: វឿង ខាំមីង with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:38:53'),
+(405, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: សាំ រុី with course ID: 1', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:42:38'),
+(406, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:56:26'),
+(407, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 134 (សាំ គឹមចុង)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 11:56:50'),
+(408, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 12:14:38'),
+(409, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 142 (សាំ រុី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 12:15:37'),
+(410, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 142 (សាំ រុី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 12:15:41'),
+(411, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 142 (សាំ រុី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-21 12:15:59'),
+(412, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:19:06'),
+(413, 'chandy', 'ADD_INVOICE', 'Created invoice for សាំ រុី (30.00)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:19:27'),
+(414, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:30:04'),
+(415, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 135 (យ៉ាន ចាន់មី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:30:35'),
+(416, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:35:55'),
+(417, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 140 (ជឿន សុវន្នី)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:37:01'),
+(418, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:42:56'),
+(419, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 138 (ណុល វិសាល)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:43:21'),
+(420, 'meakea2', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:53:46'),
+(421, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:53:57'),
+(422, 'chandy', 'UPDATE_STUDENT', 'Updated student ID: 120 (សុខ ប្រសើរ)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:54:02'),
+(423, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:54:43'),
+(424, 'chandy', 'DELETE_STUDENT', 'Deleted student ID: 136', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:54:58'),
+(425, 'chandy', 'DELETE_STUDENT', 'Deleted student ID: 118', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:55:31'),
+(426, 'chandy', 'DELETE_STUDENT', 'Deleted student ID: 117', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:55:47'),
+(427, 'chandy', 'DELETE_STUDENT', 'Deleted student ID: 116', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:55:54'),
+(428, 'chandy', 'DELETE_STUDENT', 'Deleted student ID: 112', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 10:56:07'),
+(429, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:28:18'),
+(430, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:28:33'),
+(431, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 121 (វិច ធារ៉ា)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:28:47'),
+(432, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 121 (វិច ធារ៉ា)', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:29:01'),
+(433, 'meakea2', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:47:46'),
+(434, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:47:54'),
+(435, 'adminmeakea', 'DELETE_STUDY', 'Deleted study record ID: 134', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:48:05'),
+(436, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:48:09'),
+(437, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.29', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 11:48:15'),
+(438, 'meakea2', 'LOGIN', 'User logged in successfully', '27.109.113.125', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 13:05:40'),
+(439, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 129 (ពុធ ប៊ុនឆាង)', '27.109.113.125', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 13:06:12'),
+(440, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 131 ( ពុធ ប៊ុនឈុន)', '27.109.113.125', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 13:07:46'),
+(441, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 132 (ម៉ន សាមី)', '27.109.113.125', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 13:08:05'),
+(442, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 132 (ម៉ន សាមី)', '27.109.113.125', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-22 13:09:39'),
+(443, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 08:21:34'),
+(444, 'meakea2', 'UPDATE_STUDENT', 'Updated student ID: 132 (ម៉ន សាមី)', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 08:25:58'),
+(445, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 10:17:25'),
+(446, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 11:14:51'),
+(447, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 11:32:15'),
+(448, 'meakea2', 'LOGOUT', 'User logged out', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 11:32:34'),
+(449, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 12:01:33'),
+(450, 'meakea2', 'ADD_INVOICE', 'Created invoice for យ៉ាន ចាន់មី (30.00)', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 12:26:26');
+INSERT INTO `tb_siem_logs` (`id`, `username`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
+(451, 'meakea2', 'ADD_INVOICE', 'Created invoice for ជឿន សុវន្នី (30.00)', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 12:27:31'),
+(452, 'meakea2', 'ADD_INVOICE', 'Created invoice for ម៉ន សាមី (30.00)', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-23 12:28:09'),
+(453, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.79.177', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-24 03:58:21'),
+(454, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.79.5', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-26 04:13:32'),
+(455, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.79.5', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-27 11:42:16'),
+(456, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-28 08:45:35'),
+(457, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-30 07:44:04'),
+(458, 'meakea2', 'LOGOUT', 'User logged out', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-30 07:44:47'),
+(459, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-04-30 07:44:52'),
+(460, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-03 09:03:49'),
+(461, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: យ៉ាវ ស៊ីណាត with course ID: 1', '175.100.59.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-03 09:10:56'),
+(462, 'adminmeakea', 'LOGIN', 'User logged in successfully', '27.109.114.212', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-04 11:06:09'),
+(463, 'adminmeakea', 'ADD_TIME', 'Added time slot: 7-8 ល្ងាច', '27.109.114.212', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-04 11:10:23'),
+(464, 'adminmeakea', 'UPDATE_STUDENT', 'Updated student ID: 130 (ម៉ក់ ពោរ)', '27.109.114.212', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-04 11:29:36'),
+(465, 'adminmeakea', 'LOGIN', 'User logged in successfully', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:38:10'),
+(466, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ភក្ដី សុផាន់ដា (10)', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:42:17'),
+(467, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ណុល វិសាល (30.00)', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:42:43'),
+(468, 'adminmeakea', 'LOGOUT', 'User logged out', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:43:23'),
+(469, 'meakea', 'LOGIN', 'User logged in successfully', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:43:41'),
+(470, 'meakea', 'LOGOUT', 'User logged out', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:43:59'),
+(471, 'meakea1', 'LOGIN', 'User logged in successfully', '117.20.116.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 07:44:05'),
+(472, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.5', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 09:12:41'),
+(473, 'meakea1', 'LOGIN', 'User logged in successfully', '117.20.112.62', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 11:32:58'),
+(474, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ម៉ាង សុប៊ីន with course ID: 1', '117.20.112.62', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 11:35:29'),
+(475, 'meakea1', 'ADD_INVOICE', 'Created invoice for ម៉ាង សុប៊ីន (30.00)', '117.20.112.62', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', '2026-05-11 11:35:40'),
+(476, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 12:23:18'),
+(477, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 13:12:38'),
+(478, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ជឿន សុភាន with course ID: 1', '175.100.59.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 13:14:57'),
+(479, 'chandy', 'ADD_INVOICE', 'Created invoice for ជឿន សុភាន (30.00)', '175.100.59.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 13:16:04'),
+(480, 'meakkea1', 'LOGIN_FAILED', 'User not found', '175.100.79.65', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-12 07:49:41'),
+(481, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.65', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-12 07:49:55'),
+(482, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.73', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-12 13:40:30'),
+(483, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.125', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-13 07:15:42'),
+(484, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.125', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-13 07:19:00'),
+(485, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.125', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-13 07:19:07'),
+(486, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.125', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/29.0 Chrome/136.0.0.0 Mobile Safari/537.36', '2026-05-13 10:58:13'),
+(487, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-15 11:15:48'),
+(488, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.33', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-18 12:21:49'),
+(489, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.33', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-18 12:35:26'),
+(490, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.165', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-19 09:53:09'),
+(491, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.22', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-20 11:55:22'),
+(492, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.22', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-20 12:28:49'),
+(493, 'chandy', 'LOGOUT', 'User logged out', '175.100.59.22', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-20 12:32:24'),
+(494, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.22', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-20 12:32:52'),
+(495, 'chandy', 'LOGOUT', 'User logged out', '175.100.59.22', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-20 12:33:19'),
+(496, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-22 13:08:51'),
+(497, 'meakkea2', 'LOGIN_FAILED', 'User not found', '175.100.83.51', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0', '2026-05-23 10:12:38'),
+(498, 'meakea2', 'LOGIN', 'User logged in successfully', '175.100.83.51', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0', '2026-05-23 10:12:49'),
+(499, 'meakea2', 'LOGOUT', 'User logged out', '175.100.83.51', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0', '2026-05-23 10:12:58'),
+(500, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.51', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0', '2026-05-23 10:13:12'),
+(501, 'meakea1', 'ADD_INVOICE', 'Created invoice for ពុធ សុខលី (7.5)', '175.100.83.51', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0', '2026-05-23 10:14:08'),
+(502, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.12', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-24 02:48:18'),
+(503, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.83.117', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-26 13:14:54'),
+(504, 'chandy', 'LOGOUT', 'User logged out', '175.100.83.117', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-26 13:15:22'),
+(505, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-27 12:51:46'),
+(506, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ឈឿយ មេសា with course ID: 1', '175.100.59.215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-27 12:55:13'),
+(507, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ឈឿយ សុខហេង with course ID: 1', '175.100.59.215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-27 12:56:29'),
+(508, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-28 10:26:10'),
+(509, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 07:20:36'),
+(510, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 70 (អឿមគង់ ធូរេន)', '175.100.59.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 07:28:08'),
+(511, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 07:28:28'),
+(512, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 07:28:48'),
+(513, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.83.74', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 09:24:29'),
+(514, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ឈឿយ ទេពធីតា with course ID: 1', '175.100.83.74', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 09:26:23'),
+(515, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.166', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 11:28:11'),
+(516, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: គង់ ចាន់ណៃ with course ID: 1', '175.100.79.166', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 11:30:33'),
+(517, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ធាំង ផានិត with course ID: 1', '175.100.79.166', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 11:31:30'),
+(518, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for គង់ ចាន់ណៃ (15)', '175.100.79.166', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 11:31:58'),
+(519, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.170', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-02 09:36:38'),
+(520, 'adminmeakea', 'DELETE_USER', 'Deleted user ID: 6', '175.100.59.170', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-02 09:36:53'),
+(521, 'adminmeakea', 'DELETE_USER', 'Deleted user ID: 10', '175.100.59.170', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-02 09:37:07'),
+(522, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.15', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36', '2026-06-04 12:03:27'),
+(523, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:17:53'),
+(524, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ធាំង ផានិត (15)', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:18:58'),
+(525, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for តិត វល័ក្ខ (5)', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:24:19'),
+(526, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for នី សំនៀង (17.5)', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:25:36'),
+(527, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:29:17'),
+(528, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:29:41'),
+(529, 'meakea1', 'LOGOUT', 'User logged out', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:30:09'),
+(530, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:30:17'),
+(531, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:31:19'),
+(532, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:31:28'),
+(533, 'meakea1', 'DELETE_STUDY', 'Deleted study record ID: 119', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:32:09'),
+(534, 'meakea1', 'DELETE_STUDY', 'Deleted study record ID: 118', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:32:18'),
+(535, 'meakea1', 'DELETE_STUDY', 'Deleted study record ID: 116', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:32:29'),
+(536, 'meakea1', 'DELETE_STUDY', 'Deleted study record ID: 74', '175.100.79.241', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-09 09:32:41'),
+(537, 'adminmeakea', 'LOGIN', 'User logged in successfully', '117.20.113.130', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36', '2026-06-09 11:43:21'),
+(538, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.83.206', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 06:52:02'),
+(539, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ឡាប លីនិញ with course ID: 1', '175.100.83.206', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 06:53:56'),
+(540, 'adminmeakea', 'ADD_INVOICE', 'Created invoice for ឡាប លីនិញ (30.00)', '175.100.83.206', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 06:54:06'),
+(541, 'adminmeakea', 'REGISTER_STUDENT', 'Registered student: សេង ស្រីហេង', '175.100.83.206', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 06:56:47'),
+(542, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.120', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 07:50:00'),
+(543, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.49', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 11:19:56'),
+(544, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.49', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 11:23:03'),
+(545, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.49', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 11:23:42'),
+(546, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.49', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-10 11:24:29'),
+(547, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.63', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-11 07:25:06'),
+(548, 'meakea1', 'ADD_INVOICE', 'Created invoice for អឿមគង់ ធូរេន (15)', '175.100.83.63', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-11 07:26:45'),
+(549, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.83.63', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-11 08:11:41'),
+(550, 'meakea', 'ADD_INVOICE', 'Created invoice for រ៉ា សារៀង (15)', '175.100.83.63', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-11 08:12:26'),
+(551, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.63', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-11 08:56:45'),
+(552, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-11 12:50:36'),
+(553, 'meakea', 'LOGIN', 'User logged in successfully', '117.20.115.30', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-13 06:38:14'),
+(554, 'meakea', 'ADD_USER', 'Added user: thokphally', '117.20.115.30', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-13 06:40:21'),
+(555, 'thokphally', 'LOGIN', 'User logged in successfully', '117.20.115.30', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36', '2026-06-13 06:48:22'),
+(556, 'meakea1', 'LOGIN', 'User logged in successfully', '117.20.115.30', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-13 07:05:48'),
+(557, 'meakea1', 'ADD_INVOICE', 'Created invoice for ភក្ដី សុផាន់ដា (5)', '117.20.115.30', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-13 07:06:14'),
+(558, 'thokphally', 'LOGIN', 'User logged in successfully', '175.100.48.96', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36', '2026-06-13 08:12:37'),
+(559, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-16 07:09:44'),
+(560, 'meakea1', 'ADD_INVOICE', 'Created invoice for ភក្ដី សុផាន់ដា (2.5)', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-16 07:10:06'),
+(561, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-16 07:42:09'),
+(562, 'meakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ណន សំនៀង with course ID: 1', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-16 07:53:46'),
+(563, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-16 09:37:16'),
+(564, 'thokphally', 'LOGIN', 'User logged in successfully', '117.20.113.114', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36', '2026-06-16 11:03:44'),
+(565, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-16 11:24:53'),
+(566, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', '2026-06-17 07:46:43'),
+(567, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.19', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-17 09:40:28'),
+(568, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.113', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-24 14:32:49'),
+(569, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.106', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-25 11:28:52'),
+(570, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ប៉ាវ សីហា with course ID: 1', '175.100.59.106', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-25 11:51:22'),
+(571, 'meakea1', 'ADD_INVOICE', 'Created invoice for ប៉ាវ សីហា (30.00)', '175.100.59.106', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-25 11:54:50'),
+(572, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.230', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-27 08:52:16'),
+(573, 'meakea1', 'ADD_INVOICE', 'Created invoice for គង់ ចាន់ណៃ (15)', '175.100.79.230', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-27 08:52:59'),
+(574, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.230', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-06-27 12:11:05'),
+(575, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.204', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-01 12:01:27'),
+(576, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:44:16'),
+(577, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 41 (រេត ស្រីនុត)', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:47:33'),
+(578, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 41 (រេត ស្រីនុត)', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:48:47'),
+(579, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 41 (រេត ស្រីនុត)', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:53:17'),
+(580, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:54:36'),
+(581, 'meakea1', 'LOGOUT', 'User logged out', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 09:59:09'),
+(582, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 10:00:14'),
+(583, 'meakea1', 'REGISTER_STUDENT', 'Registered student: ហឿម មេត្តា', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 10:03:06'),
+(584, 'meakea1', 'REGISTER_STUDENT', 'Registered student: ស៊ីនិត  ម៉េងហុង', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 10:04:46'),
+(585, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 156 (ស៊ីនិត  ម៉េងហុង)', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 10:07:26'),
+(586, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 155 (ហឿម មេត្តា)', '175.100.83.141', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-06 10:07:45'),
+(587, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-09 07:04:39'),
+(588, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ហេនស៊ាង ហ័រ with course ID: 1', '175.100.83.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-09 07:05:42'),
+(589, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-09 08:10:07'),
+(590, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.83.135', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36', '2026-07-11 06:43:43'),
+(591, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-11 07:00:02'),
+(592, 'meakea1', 'DELETE_STUDENT', 'Deleted student ID: 103', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-11 07:03:59'),
+(593, 'meakea1', 'REGISTER_STUDENT', 'Registered student: សោន សូវណ្ណលីដា', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-11 07:05:33'),
+(594, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 158 (សោន សូវណ្ណលីដា)', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-11 07:53:13'),
+(595, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 157 (ហេនស៊ាង ហ័រ)', '175.100.83.135', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', '2026-07-11 07:53:54'),
+(596, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 07:02:44'),
+(597, 'meakea1', 'ADD_INVOICE', 'Created invoice for សោន សូវណ្ណលីដា (5)', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 07:03:12'),
+(598, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 11:04:23'),
+(599, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 11:58:06'),
+(600, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 12:01:26'),
+(601, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:34:10'),
+(602, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:40:58'),
+(603, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:41:11'),
+(604, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:54:37'),
+(605, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:54:42'),
+(606, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:54:45'),
+(607, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:54:50'),
+(608, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 13:55:07'),
+(609, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-13 15:30:50'),
+(610, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 07:39:52'),
+(611, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ស៊ាន រចនា  with course ID: 1', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 07:41:00'),
+(612, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 159 (ស៊ាន រចនា )', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 08:20:55'),
+(613, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 09:49:48'),
+(614, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 09:52:05'),
+(615, 'meakea1', 'REGISTER_STUDENT', 'Registered student: រ៉ី សារ៉ា', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 09:52:46'),
+(616, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: មៀត សំអូន with course ID: 1', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 10:18:39'),
+(617, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 10:47:04'),
+(618, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 160 (រ៉ី សារ៉ា)', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 10:47:28'),
+(619, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 10:48:20'),
+(620, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-14 10:48:48'),
+(621, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.69', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-15 02:37:55'),
+(622, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-15 07:21:20'),
+(623, 'meakea1', 'ADD_INVOICE', 'Created invoice for ហេនស៊ាង ហ័រ (5)', '175.100.59.37', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-15 07:24:07'),
+(624, 'meakea1', 'LOGIN', 'User logged in successfully', '117.20.116.59', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-16 06:52:45'),
+(625, 'meakea1', 'ADD_INVOICE', 'Created invoice for ភក្ដី សុផាន់ដា (2.5)', '117.20.116.59', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-16 06:53:22'),
+(626, 'meakea1', 'LOGIN', 'User logged in successfully', '117.20.116.59', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-16 08:11:21'),
+(627, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.233', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-18 11:48:20'),
+(628, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-21 09:59:53'),
+(629, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ឡេង សៀវហួរ with course ID: 3', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-21 10:03:06'),
+(630, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ឡា សុឡែម with course ID: 1', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-21 10:04:28'),
+(631, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 151 (ឡាប លីនិញ)', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-21 10:15:31'),
+(632, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 154 (ប៉ាវ សីហា)', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-21 10:42:46'),
+(633, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 09:26:53'),
+(634, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ឡាក់ ប៊ីឡាញ with course ID: 1', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 09:28:06'),
+(635, 'meakea1', 'ADD_INVOICE', 'Created invoice for ឡាក់ ប៊ីឡាញ (30.00)', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 09:28:35'),
+(636, 'meakea1', 'LOGOUT', 'User logged out', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 09:31:47'),
+(637, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 09:33:05'),
+(638, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 10:31:00'),
+(639, 'meakea1', 'DELETE_STUDY', 'Deleted study record ID: 154', '175.100.83.32', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-22 10:31:57'),
+(640, 'meakea18', 'LOGIN_FAILED', 'User not found', '175.100.83.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-24 14:01:21'),
+(641, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-24 14:01:24'),
+(642, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-26 04:14:42'),
+(643, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 06:05:57'),
+(644, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 06:06:01'),
+(645, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 06:06:06'),
+(646, 'adminmeakea', 'LOGOUT', 'User logged out', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 06:19:25'),
+(647, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 09:49:53'),
+(648, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 09:58:00'),
+(649, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 11:23:56'),
+(650, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: សារី សីហា with course ID: 1', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-27 11:26:13'),
+(651, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0', '2026-07-28 10:59:06'),
+(652, 'meakea', 'UPDATE_STUDENT', 'Updated student ID: 96 (ខី ខេមារ៉ា)', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0', '2026-07-28 10:59:32'),
+(653, 'meakea', 'LOGOUT', 'User logged out', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0', '2026-07-28 10:59:42'),
+(654, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:03:19'),
+(655, 'meakea1', 'ADD_INVOICE', 'Created invoice for ឡា សុឡែម (12.5)', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:05:01'),
+(656, 'meakea1', 'REGISTER_STUDENT', 'Registered student: ឈឿន យូរៀន', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:05:58'),
+(657, 'meakea1', 'REGISTER_STUDENT', 'Registered student: ងួន ស្រីនាង', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:06:39'),
+(658, 'meakea1', 'REGISTER_STUDENT', 'Registered student: ផ្លម សំណាង', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:12:37'),
+(659, 'meakea1', 'ADD_INVOICE', 'Created invoice for ឈឿន យូរៀន (10)', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:21:26'),
+(660, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:35:14'),
+(661, 'meakea1', 'ADD_INVOICE', 'Created invoice for ភក្ដី សុផាន់ដា (10)', '175.100.59.231', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-07-30 13:36:58'),
+(662, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:14:17'),
+(663, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ងួន ស្រីនាង with course ID: 1', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:16:00'),
+(664, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ហ៊ីង គិមហី with course ID: 1', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:16:59'),
+(665, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: សៀងហៃ សៀងហន with course ID: 1', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:18:00'),
+(666, 'meakea1', 'REGISTER_STUDENT_STUDY', 'Registered student: ឈូក លីណា with course ID: 1', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:18:41'),
+(667, 'meakea1', 'ADD_INVOICE', 'Created invoice for សៀងហៃ សៀងហន (10)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:19:16'),
+(668, 'meakea1', 'ADD_INVOICE', 'Created invoice for ហ៊ីង គិមហី (10)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:19:51'),
+(669, 'meakea1', 'DELETE_STUDENT', 'Deleted student ID: 169', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:22:20'),
+(670, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:23:35'),
+(671, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:39:41'),
+(672, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 164 (ឡាក់ ប៊ីឡាញ)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:42:01'),
+(673, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 163 (ឡា សុឡែម)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:42:19'),
+(674, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 163 (ឡា សុឡែម)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:42:27'),
+(675, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 149 (គង់ ចាន់ណៃ)', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:43:05'),
+(676, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 09:46:59');
+INSERT INTO `tb_siem_logs` (`id`, `username`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
+(677, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.249', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', '2026-08-06 10:12:23'),
+(678, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.79.193', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0', '2026-08-08 14:55:29'),
+(679, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:01:55'),
+(680, 'meakea1', 'ADD_INVOICE', 'Created invoice for ឈូក លីណា (30.00)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:02:15'),
+(681, 'meakea1', 'ADD_INVOICE', 'Created invoice for សៀងហៃ សៀងហន (10)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:02:51'),
+(682, 'meakea1', 'ADD_INVOICE', 'Created invoice for ហឿម មេត្តា (5)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:03:25'),
+(683, 'meakea1', 'ADD_INVOICE', 'Created invoice for ស៊ីនិត  ម៉េងហុង (5)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:03:43'),
+(684, 'meakea1', 'DELETE_INVOICE', 'Deleted invoice ID: 94', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:10:42'),
+(685, 'meakea1', 'ADD_INVOICE', 'Created invoice for សៀងហៃ សៀងហន (20)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:10:58'),
+(686, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 162 (ឡេង សៀវហួរ)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:31:03'),
+(687, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 150 (ធាំង ផានិត)', '175.100.59.43', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-11 09:39:03'),
+(688, 'meakea1', 'LOGIN', 'User logged in successfully', '116.212.152.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-14 08:20:55'),
+(689, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.24', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-15 10:19:49'),
+(690, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 07:44:48'),
+(691, 'meakea1', 'LOGOUT', 'User logged out', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 07:45:33'),
+(692, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 07:45:40'),
+(693, 'chandy', 'ADD_INVOICE', 'Created invoice for សារី សីហា (10)', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 07:47:00'),
+(694, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 08:51:36'),
+(695, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 172 (ឈូក លីណា)', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 08:51:58'),
+(696, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 171 (សៀងហៃ សៀងហន)', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 08:52:16'),
+(697, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 170 (ហ៊ីង គិមហី)', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 08:52:37'),
+(698, 'meakea1', 'UPDATE_STUDENT', 'Updated student ID: 144 (ម៉ាង សុប៊ីន)', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 09:13:03'),
+(699, 'meakea1', 'LOGOUT', 'User logged out', '175.100.79.94', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 09:16:51'),
+(700, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 11:22:06'),
+(701, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ចំរើន ឧត្តម with course ID: 1', '175.100.59.26', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-17 11:25:44'),
+(702, 'meakea1', 'LOGIN', 'User logged in successfully', '175.100.83.131', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-18 07:03:09'),
+(703, 'meakea', 'LOGIN', 'User logged in successfully', '175.100.83.131', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0', '2026-08-18 08:06:10'),
+(704, 'meakea', 'ADD_INVOICE', 'Created invoice for ហេនស៊ាង ហ័រ (5)', '175.100.83.131', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0', '2026-08-18 08:06:28'),
+(705, 'meakea1', 'LOGIN', 'User logged in successfully', '116.212.152.101', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 02:27:13'),
+(706, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:27:03'),
+(707, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: រៀវ សំអាត with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:33:30'),
+(708, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: អ៊ុម ជាវណ្ណរី with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:34:52'),
+(709, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: អ៊ុម វណ្ណនីកា with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:36:19'),
+(710, 'chandy', 'ADD_INVOICE', 'Created invoice for រៀវ សំអាត (25.00)', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:37:10'),
+(711, 'chandy', 'ADD_INVOICE', 'Created invoice for អ៊ុម ជាវណ្ណរី (25.00)', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 10:37:29'),
+(712, 'chandy', 'LOGIN', 'User logged in successfully', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:19:14'),
+(713, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ដុង ឌឿ with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:21:06'),
+(714, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: លឿត ថាវង្ស with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:22:03'),
+(715, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ឈឺន សីហៈ  with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:23:16'),
+(716, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ពុធ ប៊ុនឆាង with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:24:20'),
+(717, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: ភាត់ រង្សី  with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:25:40'),
+(718, 'chandy', 'REGISTER_STUDENT_STUDY', 'Registered student: មេន មួយ with course ID: 1', '175.100.59.4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-19 12:26:35'),
+(719, 'adminmeakea', 'LOGIN', 'User logged in successfully', '175.100.59.224', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-20 06:25:04'),
+(720, 'adminmeakea', 'DELETE_STUDENT', 'Deleted student ID: 167', '175.100.59.224', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-20 06:26:41'),
+(721, 'adminmeakea', 'DELETE_STUDENT', 'Deleted student ID: 168', '175.100.59.224', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', '2026-08-20 06:26:49'),
+(722, 'adminmeakea', 'REGISTER_STUDENT_STUDY', 'Registered student: ម៉ាណែត with course ID: 3', '175.100.59.224', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWe
+<truncated 550824 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

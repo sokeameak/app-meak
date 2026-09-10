@@ -1,34 +1,38 @@
 <?php
-session_start();
-include '../db_connect.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit;
+// students/insert_certi.php - Issue Certificates for Finished Studies
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+require_once __DIR__ . '/../db_connect.php';
+require_login();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ids'])) {
-    $ids = $_POST['ids'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ids']) && is_array($_POST['ids'])) {
+    $studyIds = array_map('intval', $_POST['ids']);
+    $studyIds = array_filter($studyIds, function($id) { return $id > 0; });
 
-    // Validate IDs to ensure they are integers
-    $ids = array_map('intval', $ids);
-    $ids = implode(',', $ids);
+    if (!empty($studyIds)) {
+        $count = 0;
+        $stmt = $conn->prepare("INSERT INTO tbl_certi (study_id, created_at) SELECT id, NOW() FROM tb_study WHERE id = ? AND NOT EXISTS (SELECT 1 FROM tbl_certi WHERE study_id = tb_study.id)");
+        
+        if ($stmt) {
+            foreach ($studyIds as $sid) {
+                $stmt->bind_param("i", $sid);
+                if ($stmt->execute() && $stmt->affected_rows > 0) {
+                    $count++;
+                }
+            }
+            $stmt->close();
+        }
 
-    // Insert data into tbl_certi
-    $sql = "INSERT INTO tbl_certi (study_id, created_at) SELECT id, NOW() FROM tb_study WHERE id IN ($ids)";
-
-    if ($conn->query($sql) === TRUE) {
-        echo "New records created successfully";
+        log_siem_event($conn, get_logged_user(), 'ISSUE_CERTIFICATE', "Issued certificates for $count studies");
+        set_flash('success', "បានចេញវិញ្ញាបនបត្រចំនួន $count ដោយជោគជ័យ!");
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        set_flash('warning', 'សូមជ្រើសរើសសិស្សយ៉ាងហោចណាស់ម្នាក់!');
     }
 } else {
-    echo "No IDs selected.";
+    set_flash('warning', 'មិនមានទិន្នន័យត្រូវបានជ្រើសរើសឡើយ!');
 }
 
-// Redirect back to finished students page
-header("Location: finished_student.php");
+header("Location: finished.php");
 exit;
-
 ?>

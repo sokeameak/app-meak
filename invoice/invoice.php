@@ -1,355 +1,525 @@
 <?php
-session_start();
-include '../db_connect.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
-    header('Location: ../login.php');
-    exit;
+// invoice/invoice.php - Invoice & Payment Management
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+require_once __DIR__ . '/../db_connect.php';
+require_login();
 
-// Create table if not exists (Auto-setup for convenience)
-$tableCheck = "CREATE TABLE IF NOT EXISTS tb_invoices (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    student_name VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
-    amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) DEFAULT 'Unpaid',
-    study_time VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)";
-$conn->query($tableCheck);
+$user_school_id = get_logged_school_id($conn);
+$isAdmin = is_admin();
 
-// Add column if it doesn't exist (for existing tables)
-$colCheck = $conn->query("SHOW COLUMNS FROM tb_invoices LIKE 'study_time'");
-if ($colCheck->num_rows == 0) {
-    $conn->query("ALTER TABLE tb_invoices ADD COLUMN study_time VARCHAR(50)");
-}
+$page_title = $lang['invoices'];
+$page_subtitle = $lang['app_name'] . ' - ' . $lang['invoices'];
 
 // Handle Add Invoice
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_invoice'])) {
-    $student_name = $_POST['student_name'];
-    $description = $_POST['description'];
-    $amount = $_POST['amount'];
-    $status = $_POST['status'];
-    $study_time = $_POST['study_time'];
-    
-    $stmt = $conn->prepare("INSERT INTO tb_invoices (student_name, description, amount, status, study_time) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssdss", $student_name, $description, $amount, $status, $study_time);
-    $stmt->execute();
-    log_siem_event($conn, $_SESSION['user'], 'ADD_INVOICE', "Created invoice for $student_name ($amount)");
-    $stmt->close();
-    header("Location: invoice.php");
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_invoice'])) {
+    $student_id = intval($_POST['student_id'] ?? 0);
+    $student_name = trim($_POST['student_name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $amount = floatval($_POST['amount'] ?? 0);
+    $status = $_POST['status'] ?? 'Unpaid';
+    $study_time = $_POST['study_time'] ?? '';
+    $school_id = $isAdmin ? intval($_POST['school_id'] ?? 1) : ($user_school_id ?: 1);
 
-// Handle Delete Invoice
-if (isset($_GET['delete'])) {
-    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 1) {
-        header("Location: invoice.php");
-        exit;
-    }
-    $id = $_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM tb_invoices WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    log_siem_event($conn, $_SESSION['user'], 'DELETE_INVOICE', "Deleted invoice ID: $id");
-    $stmt->close();
-    header("Location: invoice.php");
-    exit;
-}
-
-// Fetch Study Times for Dropdown (Moved up for filter)
-$study_times = [];
-$studyTimeSql = "SELECT DISTINCT t.time FROM tb_study s JOIN tb_time t ON s.id_time = t.id ORDER BY t.time ASC";
-$studyTimeResult = $conn->query($studyTimeSql);
-if ($studyTimeResult) {
-    while($row = $studyTimeResult->fetch_assoc()) {
-        $study_times[] = $row['time'];
-    }
-}
-
-// Fetch Time-Student Mapping for Dynamic Dropdown
-$timeStudentMap = [];
-$mapSql = "SELECT DISTINCT t.time, st.student_name, s.price 
-           FROM tb_study s 
-           JOIN tb_students st ON s.id_stu = st.ID 
-           JOIN tb_time t ON s.id_time = t.id 
-           ORDER BY t.time, st.student_name";
-$mapResult = $conn->query($mapSql);
-if ($mapResult) {
-    while($row = $mapResult->fetch_assoc()) {
-        $timeStudentMap[$row['time']][] = [
-            'name' => $row['student_name'],
-            'price' => $row['price']
-        ];
-    }
-}
-
-// Fetch Invoices
-$search = $_GET['search'] ?? '';
-$filter_time = $_GET['filter_time'] ?? '';
-$chk_paid = isset($_GET['chk_paid']) ? true : (empty($_GET) ? true : false);
-$chk_unpaid = isset($_GET['chk_unpaid']) ? true : (empty($_GET) ? true : false);
-$chk_pending = isset($_GET['chk_pending']) ? true : (empty($_GET) ? true : false);
-
-$status_filters = [];
-if ($chk_paid) $status_filters[] = "'Paid'";
-if ($chk_unpaid) $status_filters[] = "'Unpaid'";
-if ($chk_pending) $status_filters[] = "'Pending'";
-
-$sql = "SELECT * FROM tb_invoices WHERE 1=1";
-$params = [];
-$types = "";
-
-if ($search) {
-    $sql .= " AND student_name LIKE ?";
-    $params[] = "%" . $search . "%";
-    $types .= "s";
-}
-
-if ($filter_time) {
-    $sql .= " AND study_time = ?";
-    $params[] = $filter_time;
-    $types .= "s";
-}
-
-if (!empty($status_filters)) {
-    $sql .= " AND status IN (" . implode(",", $status_filters) . ")";
-} else {
-    $sql .= " AND 1=0";
-}
-
-$sql .= " ORDER BY created_at DESC";
-
-$stmt = $conn->prepare($sql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Fetch Students for Dropdown
-$studentSql = "SELECT student_name FROM tb_students ORDER BY student_name ASC";
-$studentResult = $conn->query($studentSql);
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Management</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, 'Khmer OS', sans-serif; background: #f4f4f4; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
-        .sidebar a { display: block; padding: 10px; margin: 5px 0; text-decoration: none; color: white; border-radius: 5px; }
-        .sidebar a:hover { background: #34495e; }
-        .sidebar a i { margin-right: 10px; width: 20px; text-align: center; }
-        .main-content { flex: 1; padding: 20px; }
-        .header { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #2c3e50; color: white; }
-        .btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;}
-        .btn:hover { background: #2980b9; }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; }
-        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .badge { padding: 5px 10px; border-radius: 15px; font-size: 0.8em; color: white; }
-        .status-paid { background: #2ecc71; }
-        .status-unpaid { background: #e74c3c; }
-        .status-pending { background: #f1c40f; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div style="text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #34495e;">
-                <div style="width: 80px; height: 80px; background: #ecf0f1; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #2c3e50; font-weight: bold;">
-                    <?php echo strtoupper(substr($_SESSION['user'], 0, 1)); ?>
-                </div>
-                <div style="color: white; font-weight: bold; font-size: 1.1em;"><?php echo htmlspecialchars($_SESSION['user']); ?></div>
-                <div style="color: #bdc3c7; font-size: 0.8em; margin-top: 5px;">Administrator</div>
-            </div>
-            <h3>Dashboard</h3>
-            <a href="../dashboard.php?page=home"><i class="fa-solid fa-home"></i> Home</a>
-            <a href="../students/list_student.php"><i class="fa-solid fa-user-graduate"></i> Students</a>
-            <a href="../students/register_student.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
-            <a href="../students/finished_student.php"><i class="fa-solid fa-user-check"></i> Finished Students</a>
-            <a href="../study/list_study.php"><i class="fa-solid fa-book-open"></i> Study</a>
-            <a href="../courses/add_course.php"><i class="fa-solid fa-chalkboard"></i> Course</a>
-            <a href="../time/grades.php"><i class="fa-solid fa-clock"></i> Grades</a>
-            <a href="invoice.php" style="background: #34495e;"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</a>
-            <a href="paid.php"><i class="fa-solid fa-file-invoice"></i> Paid List</a>
-            <a href="../logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
-        </div>
-
-        <div class="main-content">
-            <div class="header">
-                <h1>Invoice Management</h1>
-            </div>
-
-            <div class="card">
-                <h2>Create New Invoice</h2>
-                <form method="POST" style="margin-top: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label>Study Time</label>
-                            <select name="study_time" id="study_time_select" onchange="updateStudents()" required>
-                                <option value="">Select Time</option>
-                                <?php 
-                                foreach ($study_times as $time) {
-                                    echo '<option value="' . htmlspecialchars($time) . '">' . htmlspecialchars($time) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Student Name</label>
-                            <select name="student_name" id="student_name_select" required>
-                                <option value="">Select Time First</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Amount ($)</label>
-                        <input type="number" step="0.01" name="amount" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" name="description" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="Unpaid">Unpaid</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Paid">Paid</option>
-                        </select>
-                    </div>
-                    <button type="submit" name="add_invoice" class="btn">Create Invoice</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2>Invoice List</h2>
-                    <form method="GET" style="display: flex; gap: 10px;">
-                        <label style="display: flex; align-items: center;"><input type="checkbox" name="chk_paid" <?php echo $chk_paid ? 'checked' : ''; ?> style="margin-right: 5px;"> Paid</label>
-                        <label style="display: flex; align-items: center;"><input type="checkbox" name="chk_unpaid" <?php echo $chk_unpaid ? 'checked' : ''; ?> style="margin-right: 5px;"> Unpaid</label>
-                        <label style="display: flex; align-items: center;"><input type="checkbox" name="chk_pending" <?php echo $chk_pending ? 'checked' : ''; ?> style="margin-right: 5px;"> Pending</label>
-                        <input type="text" name="search" placeholder="Search student..." value="<?php echo htmlspecialchars($search); ?>" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                        <select name="filter_time" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="">All Times</option>
-                            <?php foreach ($study_times as $time): ?>
-                                <option value="<?php echo htmlspecialchars($time); ?>" <?php echo ($filter_time === $time) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($time); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn">Search</button>
-                        <?php if ($search || $filter_time): ?><a href="invoice.php" class="btn" style="background: #95a5a6;">Clear</a><?php endif; ?>
-                    </form>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Student</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th style="width: 120px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td>#<?php echo $row['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($row['student_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                    <td>$<?php echo number_format($row['amount'], 2); ?></td>
-                                    <td><?php echo htmlspecialchars($row['study_time'] ?? '-'); ?></td>
-                                    <td>
-                                        <?php 
-                                            $statusClass = 'status-pending';
-                                            if ($row['status'] == 'Paid') $statusClass = 'status-paid';
-                                            elseif ($row['status'] == 'Unpaid') $statusClass = 'status-unpaid';
-                                        ?>
-                                        <span class="badge <?php echo $statusClass; ?>"><?php echo $row['status']; ?></span>
-                                    </td>
-                                    <td><?php echo date('M d, Y', strtotime($row['created_at'])); ?></td>
-                                    <td>
-                                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 1): ?>
-                                        <a href="invoice.php?delete=<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')" style="font-size: 0.8em;" title="Delete"><i class="fa-solid fa-trash"></i></a>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr><td colspan="8">No invoices found.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const timeStudentMap = <?php echo json_encode($timeStudentMap); ?>;
-        const searchParam = "<?php echo htmlspecialchars($search); ?>";
-
-        function updateStudents() {
-            const timeSelect = document.getElementById('study_time_select');
-            const studentSelect = document.getElementById('student_name_select');
-            const selectedTime = timeSelect.value;
-
-            studentSelect.innerHTML = '<option value="">Select Student</option>';
-
-            if (selectedTime && timeStudentMap[selectedTime]) {
-                timeStudentMap[selectedTime].forEach(student => {
-                    const option = document.createElement('option');
-                    option.value = student.name;
-                    option.textContent = student.name;
-                    option.dataset.price = student.price;
-                    studentSelect.appendChild(option);
-                });
-            }
+    if (empty($student_name) && $student_id > 0) {
+        $sRes = $conn->query("SELECT student_name, school_id FROM tb_students WHERE id = $student_id");
+        if ($sRes && $sRow = $sRes->fetch_assoc()) {
+            $student_name = $sRow['student_name'];
+            if (!$isAdmin && $school_id <= 0) $school_id = intval($sRow['school_id']);
         }
+    }
 
-        document.getElementById('student_name_select').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.dataset.price) {
-                document.querySelector('input[name="amount"]').value = selectedOption.dataset.price;
+    if (empty($student_name) || $amount <= 0) {
+        set_flash('danger', $lang['fill_required']);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO tb_invoices (student_id, student_name, description, amount, status, study_time, school_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param("issdssi", $student_id, $student_name, $description, $amount, $status, $study_time, $school_id);
+            if ($stmt->execute()) {
+                log_siem_event($conn, get_logged_user(), 'ADD_INVOICE', "Created invoice for $student_name ($amount, $status)");
+                set_flash('success', $lang['saved_success']);
+            } else {
+                set_flash('danger', 'Error: ' . $stmt->error);
             }
-        });
+            $stmt->close();
+        }
+    }
+    header("Location: invoice.php");
+    exit;
+}
 
-        // Auto-select based on search parameter
-        if (searchParam) {
-            for (const [time, students] of Object.entries(timeStudentMap)) {
-                const student = students.find(s => s.name === searchParam);
-                if (student) {
-                    document.getElementById('study_time_select').value = time;
-                    updateStudents();
-                    document.getElementById('student_name_select').value = searchParam;
-                    if (student.price) {
-                        document.querySelector('input[name="amount"]').value = student.price;
+// Handle Update Status
+if (isset($_GET['set_status']) && isset($_GET['id'])) {
+    $invId = intval($_GET['id']);
+    $newStatus = in_array($_GET['set_status'], ['Paid', 'Unpaid', 'Pending']) ? $_GET['set_status'] : 'Unpaid';
+
+    $stmtUp = $conn->prepare("UPDATE tb_invoices SET status = ? WHERE id = ?");
+    if ($stmtUp) {
+        $stmtUp->bind_param("si", $newStatus, $invId);
+        $stmtUp->execute();
+        log_siem_event($conn, get_logged_user(), 'UPDATE_INVOICE_STATUS', "Changed invoice ID $invId status to $newStatus");
+        set_flash('success', $lang['saved_success']);
+        $stmtUp->close();
+    }
+    header("Location: invoice.php");
+    exit;
+}
+
+// Handle Delete Invoice (Admin only)
+if (isset($_GET['delete'])) {
+    if (!$isAdmin) {
+        set_flash('danger', 'Unauthorized action');
+    } else {
+        $delId = intval($_GET['delete']);
+        $stmtDel = $conn->prepare("DELETE FROM tb_invoices WHERE id = ?");
+        if ($stmtDel) {
+            $stmtDel->bind_param("i", $delId);
+            $stmtDel->execute();
+            log_siem_event($conn, get_logged_user(), 'DELETE_INVOICE', "Deleted invoice ID: $delId");
+            set_flash('success', $lang['deleted_success']);
+            $stmtDel->close();
+        }
+    }
+    header("Location: invoice.php");
+    exit;
+}
+
+// Fetch Students with Active Study for Dropdown
+$studentWhere = "";
+if (!$isAdmin && $user_school_id > 0) {
+    $studentWhere = " WHERE school_id = " . intval($user_school_id);
+}
+$students = [];
+$stuRes = $conn->query("SELECT id, id as ID, student_name, school_id FROM tb_students $studentWhere ORDER BY student_name ASC");
+if ($stuRes) {
+    while ($r = $stuRes->fetch_assoc()) $students[] = $r;
+}
+
+// Fetch Study Times for Dropdown
+$study_times = [];
+$timeRes = $conn->query("SELECT id, time FROM tb_time ORDER BY id ASC");
+if ($timeRes) {
+    while ($r = $timeRes->fetch_assoc()) $study_times[] = $r['time'];
+}
+
+// Fetch Schools
+$schools = [];
+if ($isAdmin) {
+    $sRes = $conn->query("SELECT id, school_name, school_name_kh FROM tb_schools ORDER BY school_name");
+    if ($sRes) {
+        while ($r = $sRes->fetch_assoc()) $schools[] = $r;
+    }
+}
+
+// Check for pre-selected student from URL (?student_id=XX)
+$pre_student_id = intval($_GET['student_id'] ?? 0);
+$prefill_student = null;
+$prefill_amount = '';
+$prefill_time = '';
+$prefill_school_id = 0;
+
+if ($pre_student_id > 0) {
+    $pStmt = $conn->prepare("SELECT s.*, sch.school_name, sch.school_name_kh FROM tb_students s LEFT JOIN tb_schools sch ON s.school_id = sch.id WHERE s.id = ?");
+    if ($pStmt) {
+        $pStmt->bind_param("i", $pre_student_id);
+        $pStmt->execute();
+        $pRes = $pStmt->get_result();
+        if ($pRes && $pRow = $pRes->fetch_assoc()) {
+            $prefill_student = $pRow;
+            $prefill_school_id = intval($pRow['school_id']);
+
+            // Find latest study
+            $stStmt = $conn->prepare("SELECT st.price, t.time FROM tb_study st JOIN tb_time t ON st.id_time = t.id WHERE st.id_stu = ? ORDER BY (st.end_date > CURDATE()) DESC, st.id DESC LIMIT 1");
+            if ($stStmt) {
+                $stStmt->bind_param("i", $pre_student_id);
+                $stStmt->execute();
+                $stRes = $stStmt->get_result();
+                $coursePrice = 0.0;
+                if ($stRes && $stRow = $stRes->fetch_assoc()) {
+                    $coursePrice = floatval($stRow['price']);
+                    $prefill_time = $stRow['time'];
+                }
+                $stStmt->close();
+
+                // Compute total paid
+                $invStmt = $conn->prepare("SELECT SUM(amount) as paid FROM tb_invoices WHERE (student_id = ? OR student_name = ?) AND status = 'Paid'");
+                if ($invStmt) {
+                    $invStmt->bind_param("is", $pre_student_id, $pRow['student_name']);
+                    $invStmt->execute();
+                    $invRes = $invStmt->get_result();
+                    $paidSoFar = 0.0;
+                    if ($invRes && $invRow = $invRes->fetch_assoc()) {
+                        $paidSoFar = floatval($invRow['paid'] ?? 0);
                     }
-                    break;
+                    $invStmt->close();
+
+                    $remain = max(0, $coursePrice - $paidSoFar);
+                    $prefill_amount = ($remain > 0) ? $remain : ($coursePrice > 0 ? $coursePrice : '');
                 }
             }
         }
-    </script>
-</body>
-</html>
+        $pStmt->close();
+    }
+}
+
+// Filters
+$search = trim($_GET['search'] ?? '');
+$filter_time = $_GET['filter_time'] ?? '';
+$filter_school = $_GET['filter_school'] ?? '';
+$status_filter = $_GET['status_filter'] ?? '';
+
+$whereClauses = ["1=1"];
+
+if (!empty($search)) {
+    $whereClauses[] = "i.student_name LIKE '%" . $conn->real_escape_string($search) . "%'";
+}
+
+if (!empty($filter_time)) {
+    $whereClauses[] = "i.study_time = '" . $conn->real_escape_string($filter_time) . "'";
+}
+
+if (!empty($status_filter)) {
+    $whereClauses[] = "i.status = '" . $conn->real_escape_string($status_filter) . "'";
+}
+
+if (!$isAdmin && $user_school_id > 0) {
+    $whereClauses[] = "i.school_id = " . intval($user_school_id);
+} elseif (!empty($filter_school)) {
+    $whereClauses[] = "i.school_id = " . intval($filter_school);
+}
+
+$whereSQL = " WHERE " . implode(" AND ", $whereClauses);
+
+// Fetch Invoices
+$sql = "SELECT i.*, sch.school_name_kh, sch.school_name 
+        FROM tb_invoices i 
+        LEFT JOIN tb_schools sch ON i.school_id = sch.id 
+        $whereSQL 
+        ORDER BY i.id DESC";
+$result = $conn->query($sql);
+
+// Calculate Totals
+$totalInvoiced = 0;
+$totalPaid = 0;
+$totalUnpaid = 0;
+
+$totRes = $conn->query("SELECT 
+    SUM(amount) as total_inv,
+    SUM(CASE WHEN status = 'Paid' THEN amount ELSE 0 END) as total_p,
+    SUM(CASE WHEN status != 'Paid' THEN amount ELSE 0 END) as total_u
+    FROM tb_invoices i $whereSQL");
+if ($totRes) {
+    $totRow = $totRes->fetch_assoc();
+    $totalInvoiced = floatval($totRow['total_inv'] ?? 0);
+    $totalPaid = floatval($totRow['total_p'] ?? 0);
+    $totalUnpaid = floatval($totRow['total_u'] ?? 0);
+}
+
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
+?>
+
+<!-- Statistics Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fa-solid fa-file-invoice"></i>
+        </div>
+        <div class="stat-content">
+            <h4>សរុបវិក្កយបត្រ (Total Invoiced)</h4>
+            <div class="stat-value"><?php echo format_money($totalInvoiced); ?></div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="stat-content">
+            <h4>បានទូទាត់រួច (Paid)</h4>
+            <div class="stat-value"><?php echo format_money($totalPaid); ?></div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon red">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div class="stat-content">
+            <h4>នៅខ្វះមិនទាន់បង់ (Unpaid / Pending)</h4>
+            <div class="stat-value"><?php echo format_money($totalUnpaid); ?></div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 24px; align-items: start;">
+
+    <!-- Add Invoice Form -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-file-circle-plus" style="color: var(--secondary);"></i>
+                <span><?php echo $lang['add_new']; ?> វិក្កយបត្រ</span>
+            </div>
+        </div>
+
+        <form method="POST" action="invoice.php">
+            <input type="hidden" name="add_invoice" value="1">
+
+            <div class="form-group">
+                <label for="student_id"><?php echo $lang['student_name']; ?> <span style="color: var(--danger);">*</span></label>
+                <select id="student_id" name="student_id" class="form-control" onchange="updateStudentName(this)" required>
+                    <option value=""><?php echo $selected_lang === 'kh' ? '-- ជ្រើសរើសសិស្ស --' : '-- Select Student --'; ?></option>
+                    <?php foreach ($students as $s): 
+                        $sId = $s['id'] ?? ($s['ID'] ?? 0);
+                        $sel = ($sId == $pre_student_id) ? 'selected' : '';
+                    ?>
+                        <option value="<?php echo $sId; ?>" data-name="<?php echo htmlspecialchars($s['student_name']); ?>" <?php echo $sel; ?>>
+                            <?php echo htmlspecialchars($s['student_name'] . ' (#' . $sId . ')'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="hidden" id="student_name" name="student_name" value="<?php echo htmlspecialchars($prefill_student['student_name'] ?? ''); ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="description"><?php echo $lang['description']; ?></label>
+                <input type="text" id="description" name="description" class="form-control" placeholder="e.g. Course Fee, Book, Registration..." value="<?php echo $prefill_student ? 'បង់ថ្លៃសិក្សា' : ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="amount"><?php echo $lang['amount']; ?> ($) <span style="color: var(--danger);">*</span></label>
+                <input type="number" step="0.01" id="amount" name="amount" class="form-control" required placeholder="0.00" value="<?php echo !empty($prefill_amount) ? number_format((float)$prefill_amount, 2, '.', '') : ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="study_time"><?php echo $lang['time_slot']; ?></label>
+                <select id="study_time" name="study_time" class="form-control">
+                    <option value=""><?php echo $lang['all_times']; ?></option>
+                    <?php foreach ($study_times as $st): 
+                        $selTime = ($st === $prefill_time) ? 'selected' : '';
+                    ?>
+                        <option value="<?php echo htmlspecialchars($st); ?>" <?php echo $selTime; ?>><?php echo htmlspecialchars($st); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status"><?php echo $lang['status']; ?> <span style="color: var(--danger);">*</span></label>
+                <select id="status" name="status" class="form-control" required>
+                    <option value="Unpaid">Unpaid (មិនទាន់បង់)</option>
+                    <option value="Paid" <?php echo $prefill_student ? 'selected' : ''; ?>>Paid (បានបង់រួច)</option>
+                    <option value="Pending">Pending (រង់ចាំ)</option>
+                </select>
+            </div>
+
+            <?php if ($isAdmin): ?>
+                <div class="form-group">
+                    <label for="school_id"><?php echo $lang['school']; ?></label>
+                    <select id="school_id" name="school_id" class="form-control">
+                        <?php foreach ($schools as $s): 
+                            $selSchool = ($s['id'] == $prefill_school_id) ? 'selected' : '';
+                        ?>
+                            <option value="<?php echo $s['id']; ?>" <?php echo $selSchool; ?>>
+                                <?php echo htmlspecialchars($s['school_name_kh'] ?: $s['school_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                <i class="fa-solid fa-floppy-disk"></i> <?php echo $lang['save']; ?>
+            </button>
+        </form>
+    </div>
+
+    <!-- Invoices List -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-receipt" style="color: var(--secondary);"></i>
+                <span><?php echo $lang['invoices']; ?></span>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <form method="GET" action="invoice.php" style="background: #f8fafc; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="<?php echo $lang['student_name']; ?>..." class="form-control" style="width: 150px; font-size: 13px;">
+
+            <select name="status_filter" class="form-control" style="width: 130px; font-size: 13px;">
+                <option value=""><?php echo $selected_lang === 'kh' ? '-- គ្រប់ស្ថានភាព --' : '-- All Status --'; ?></option>
+                <option value="Paid" <?php echo ($status_filter === 'Paid') ? 'selected' : ''; ?>>Paid</option>
+                <option value="Unpaid" <?php echo ($status_filter === 'Unpaid') ? 'selected' : ''; ?>>Unpaid</option>
+                <option value="Pending" <?php echo ($status_filter === 'Pending') ? 'selected' : ''; ?>>Pending</option>
+            </select>
+
+            <select name="filter_time" class="form-control" style="width: 140px; font-size: 13px;">
+                <option value=""><?php echo $lang['all_times']; ?></option>
+                <?php foreach ($study_times as $st): ?>
+                    <option value="<?php echo htmlspecialchars($st); ?>" <?php echo ($filter_time === $st) ? 'selected' : ''; ?>><?php echo htmlspecialchars($st); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <?php if ($isAdmin): ?>
+                <select name="filter_school" class="form-control" style="width: 140px; font-size: 13px;">
+                    <option value=""><?php echo $lang['all_schools']; ?></option>
+                    <?php foreach ($schools as $s): ?>
+                        <option value="<?php echo $s['id']; ?>" <?php echo ($filter_school == $s['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($s['school_name_kh'] ?: $s['school_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            <?php endif; ?>
+
+            <button type="submit" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-filter"></i>
+            </button>
+
+            <a href="invoice.php" class="btn btn-light btn-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </a>
+        </form>
+
+        <!-- Invoices Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th><?php echo $lang['student_name']; ?></th>
+                        <th><?php echo $lang['description']; ?></th>
+                        <th><?php echo $lang['amount']; ?></th>
+                        <th><?php echo $lang['status']; ?></th>
+                        <th><?php echo $lang['time_slot']; ?></th>
+                        <th><?php echo $lang['created_at']; ?></th>
+                        <th style="width: 120px; text-align: center;"><?php echo $lang['actions']; ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($result && $result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><strong style="color: var(--text-muted);">#<?php echo $row['id']; ?></strong></td>
+                                <td>
+                                    <a href="javascript:void(0)" onclick="openPaymentModal(<?php echo intval($row['student_id'] ?? 0); ?>, '<?php echo addslashes($row['student_name']); ?>')" class="student-pay-link" title="ចុចដើម្បីបង់ប្រាក់">
+                                        <i class="fa-solid fa-circle-dollar-to-slot" style="color: #10b981; margin-right: 4px;"></i>
+                                        <strong><?php echo htmlspecialchars($row['student_name']); ?></strong>
+                                    </a>
+                                </td>
+                                <td><span style="font-size: 13px; color: var(--text-muted);"><?php echo htmlspecialchars($row['description'] ?? '-'); ?></span></td>
+                                <td style="font-weight: 700; color: #b45309;"><?php echo format_money($row['amount']); ?></td>
+                                <td>
+                                    <?php if ($row['status'] === 'Paid'): ?>
+                                        <a href="invoice.php?set_status=Unpaid&id=<?php echo $row['id']; ?>" class="badge badge-success" style="text-decoration: none;" title="ចុចដើម្បីប្តូរទៅ Unpaid">
+                                            <i class="fa-solid fa-check"></i> Paid
+                                        </a>
+                                    <?php elseif ($row['status'] === 'Pending'): ?>
+                                        <a href="invoice.php?set_status=Paid&id=<?php echo $row['id']; ?>" class="badge badge-warning" style="text-decoration: none;" title="ចុចដើម្បីប្តូរទៅ Paid">
+                                            <i class="fa-solid fa-clock"></i> Pending
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="invoice.php?set_status=Paid&id=<?php echo $row['id']; ?>" class="badge badge-danger" style="text-decoration: none;" title="ចុចដើម្បីប្តូរទៅ Paid">
+                                            <i class="fa-solid fa-xmark"></i> Unpaid
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                                <td><span class="badge badge-info"><?php echo htmlspecialchars($row['study_time'] ?? '-'); ?></span></td>
+                                <td><span style="font-size: 12px; color: var(--text-muted);"><?php echo !empty($row['created_at']) ? khmer_date($row['created_at']) : '-'; ?></span></td>
+                                <td style="text-align: center;">
+                                    <div style="display: inline-flex; gap: 4px;">
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="printInvoiceReceipt(<?php echo htmlspecialchars(json_encode($row)); ?>)" title="<?php echo $lang['print']; ?>">
+                                            <i class="fa-solid fa-print"></i>
+                                        </button>
+                                        <?php if ($isAdmin): ?>
+                                            <a href="invoice.php?delete=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirmDelete('<?php echo addslashes($lang['confirm_delete']); ?>')" title="<?php echo $lang['delete']; ?>">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                <i class="fa-solid fa-folder-open" style="font-size: 32px; color: #cbd5e1; margin-bottom: 8px; display: block;"></i>
+                                <?php echo $lang['no_records']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Printable Receipt Modal / Script -->
+<script>
+function updateStudentName(select) {
+    var selectedOption = select.options[select.selectedIndex];
+    var studentName = selectedOption.getAttribute('data-name');
+    document.getElementById('student_name').value = studentName || '';
+}
+
+function printInvoiceReceipt(inv) {
+    var printWindow = window.open('', '_blank', 'width=700,height=600');
+    var html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>បង្កាន់ដៃទទួលប្រាក់ - #${inv.id}</title>
+            <style>
+                body { font-family: 'Kantumruy Pro', Arial, sans-serif; padding: 40px; color: #1e293b; }
+                .receipt-box { max-width: 550px; margin: 0 auto; border: 2px solid #e2e8f0; padding: 30px; border-radius: 12px; }
+                .header { text-align: center; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; }
+                .header h2 { margin: 0 0 6px; color: #1e3a8a; }
+                .header p { margin: 0; color: #64748b; font-size: 14px; }
+                .info-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 15px; }
+                .total-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 2px dashed #cbd5e1; font-size: 18px; font-weight: bold; color: #1e3a8a; }
+                .signature-area { display: flex; justify-content: space-between; margin-top: 50px; padding-top: 20px; }
+                .sig-box { text-align: center; width: 180px; }
+                .sig-line { border-top: 1px solid #94a3b8; margin-top: 40px; padding-top: 6px; font-size: 13px; }
+            </style>
+        </head>
+        <body>
+            <div class="receipt-box">
+                <div class="header">
+                    <h2>មាគ៌ាកុំព្យូទ័រ</h2>
+                    <p>បង្កាន់ដៃទទួលប្រាក់ / PAYMENT RECEIPT</p>
+                    <p style="font-size: 12px; margin-top: 4px;">លេខវិក្កយបត្រ៖ <strong>#INV-${inv.id}</strong> | កាលបរិច្ឆេទ៖ ${inv.created_at}</p>
+                </div>
+                <div class="info-row"><span>ឈ្មោះសិស្ស (Student Name):</span> <strong>${inv.student_name}</strong></div>
+                <div class="info-row"><span>បរិយាយ (Description):</span> <strong>${inv.description || 'វគ្គសិក្សា'}</strong></div>
+                <div class="info-row"><span>ម៉ោងសិក្សា (Time Slot):</span> <strong>${inv.study_time || 'N/A'}</strong></div>
+                <div class="info-row"><span>ស្ថានភាព (Status):</span> <strong style="color: ${inv.status === 'Paid' ? '#10b981' : '#ef4444'}">${inv.status}</strong></div>
+                
+                <div class="total-row">
+                    <span>ចំនួនទឹកប្រាក់សរុប (Total Amount):</span>
+                    <span>$${parseFloat(inv.amount).toFixed(2)}</span>
+                </div>
+
+                <div class="signature-area">
+                    <div class="sig-box">
+                        <div class="sig-line">ហត្ថលេខាអ្នកបង់ប្រាក់</div>
+                    </div>
+                    <div class="sig-box">
+                        <div class="sig-line">ហត្ថលេខាអ្នកទទួលប្រាក់</div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                window.onload = function() { window.print(); }
+            <\/script>
+        </body>
+        </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+}
+</script>
+
+<?php include __DIR__ . '/../includes/payment_modal.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
